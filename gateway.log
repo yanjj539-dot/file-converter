@@ -1,0 +1,18 @@
+[90m2026-04-12T21:43:59.928+08:00[39m [36m[gateway][39m [36mloading configuration…[39m
+[90m2026-04-12T21:44:01.627+08:00[39m [36m[gateway][39m [36mresolving authentication…[39m
+[90m2026-04-12T21:44:01.814+08:00[39m [36m[gateway][39m [36mstarting...[39m
+[90m2026-04-12T21:44:17.727+08:00[39m [36m[gateway][39m [36mstarting HTTP server...[39m
+[90m2026-04-12T21:44:17.731+08:00[39m [35m[canvas][39m [36mhost mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root C:\Users\严\.openclaw\canvas)[39m
+[90m2026-04-12T21:44:17.738+08:00[39m [36m[gateway][39m [36mMCP loopback server listening on http://127.0.0.1:49472/mcp[39m
+[90m2026-04-12T21:44:17.790+08:00[39m [36m[heartbeat][39m [36mstarted[39m
+[90m2026-04-12T21:44:17.793+08:00[39m [32m[health-monitor][39m [36mstarted (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)[39m
+[90m2026-04-12T21:44:17.971+08:00[39m [36m[gateway][39m [36magent model: deepseek/deepseek-chat[39m
+[90m2026-04-12T21:44:17.972+08:00[39m [36m[gateway][39m [36mready (5 plugins: acpx, browser, device-pair, phone-control, talk-voice; 16.2s)[39m
+[90m2026-04-12T21:44:17.974+08:00[39m [36m[gateway][39m [36mlog file: C:\Users\严\AppData\Local\Temp\openclaw\openclaw-2026-04-12.log[39m
+[90m2026-04-12T21:44:17.976+08:00[39m [36m[gateway][39m [36mstarting channels and sidecars...[39m
+[90m2026-04-12T21:44:18.203+08:00[39m [33m[hooks][39m [36mloaded 4 internal hook handlers[39m
+[90m2026-04-12T21:44:18.207+08:00[39m [35m[plugins][39m [36membedded acpx runtime backend registered (cwd: C:\Users\严\.openclaw\workspace)[39m
+2026-04-12T21:44:18.259+08:00 (node:173244) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[90m2026-04-12T21:44:18.265+08:00[39m [36m[browser/server][39m [36mBrowser control listening on http://127.0.0.1:18791/ (auth=token)[39m
+[90m2026-04-12T21:44:23.722+08:00[39m [35m[plugins][39m [33membedded acpx runtime backend probe failed: embedded ACP runtime probe failed (agent=codex; command=npx @zed-industries/codex-acp@^0.11.1; cwd=C:\Users\严\.openclaw\workspace; ACP connection closed)[39m
