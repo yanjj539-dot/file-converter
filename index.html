@@ -273,6 +273,76 @@
     height: 36px;
     background: var(--border);
   }
+
+  /* ── 关于我 + 技能 ── */
+  #about {
+    padding: 80px 40px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    color: var(--accent);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 640px) {
+    .about-grid { grid-template-columns: 1fr; }
+    #about { padding: 60px 20px; }
+  }
+
+  .card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: border-color 0.25s;
+  }
+
+  .card:hover { border-color: var(--border-accent); }
+
+  .card-label {
+    color: var(--accent);
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 14px;
+  }
+
+  .card p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .skills-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .skill-tag {
+    background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.25);
+    color: var(--accent);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .skill-tag:hover {
+    background: rgba(99,102,241,0.22);
+    border-color: rgba(99,102,241,0.5);
+  }
 </style>
 </head>
 <body>
@@ -320,7 +390,28 @@
         </div>
       </div>
     </section>
-    <section id="about"></section>
+    <section id="about">
+      <p class="section-label">// 关于我 &amp; 技能</p>
+      <div class="about-grid">
+        <div class="card">
+          <p class="card-label">ABOUT ME</p>
+          <p>热爱设计与技术的交叉地带，相信好的产品应该既好看又好用。目前专注于 Web 前端开发和交互设计，喜欢探索新技术和创意表达。</p>
+        </div>
+        <div class="card">
+          <p class="card-label">SKILLS</p>
+          <div class="skills-cloud">
+            <span class="skill-tag">React</span>
+            <span class="skill-tag">TypeScript</span>
+            <span class="skill-tag">Figma</span>
+            <span class="skill-tag">CSS</span>
+            <span class="skill-tag">Node.js</span>
+            <span class="skill-tag">UI/UX</span>
+            <span class="skill-tag">HTML5</span>
+            <span class="skill-tag">Git</span>
+          </div>
+        </div>
+      </div>
+    </section>
     <section id="faq"></section>
   </main>
   <footer id="footer"></footer>
