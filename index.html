@@ -411,6 +411,46 @@
     font-size: 13px;
     line-height: 1.75;
   }
+
+  /* ── Footer ── */
+  #footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  @media (max-width: 640px) {
+    #footer {
+      flex-direction: column;
+      text-align: center;
+      padding: 28px 20px;
+    }
+  }
+
+  .footer-copy {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+  }
+
+  .footer-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12px;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--accent); }
 </style>
 </head>
 <body>
@@ -513,7 +553,14 @@
       </div>
     </section>
   </main>
-  <footer id="footer"></footer>
+  <footer id="footer">
+    <span class="footer-copy">© 2026 Alex Chen · Built with ♥</span>
+    <ul class="footer-links">
+      <li><a href="#" target="_blank" rel="noopener">GitHub</a></li>
+      <li><a href="#" target="_blank" rel="noopener">Twitter</a></li>
+      <li><a href="mailto:hello@example.com">Email</a></li>
+    </ul>
+  </footer>
   <script>
     // 导航毛玻璃
     window.addEventListener('scroll', () => {
