@@ -343,6 +343,74 @@
     background: rgba(99,102,241,0.22);
     border-color: rgba(99,102,241,0.5);
   }
+
+  /* ── FAQ ── */
+  #faq {
+    padding: 80px 40px;
+    max-width: 960px;
+    margin: 0 auto;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    #faq { padding: 60px 20px; }
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .faq-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+
+  .faq-item.open {
+    border-color: var(--border-accent);
+    background: rgba(99,102,241,0.04);
+  }
+
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .faq-question-text {
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  .faq-icon {
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+
+  .faq-answer-inner {
+    padding: 0 20px 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.75;
+  }
 </style>
 </head>
 <body>
@@ -412,7 +480,38 @@
         </div>
       </div>
     </section>
-    <section id="faq"></section>
+    <section id="faq">
+      <p class="section-label">// 常见问题</p>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-question">
+            <span class="faq-question-text">01 &nbsp; 你目前接受新项目合作吗？</span>
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">是的，目前开放合作机会。欢迎通过下方联系方式与我取得联系，简单描述你的项目需求即可。</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span class="faq-question-text">02 &nbsp; 你擅长哪类项目？</span>
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">专注于 Web 应用、品牌视觉设计和交互原型，尤其擅长将复杂需求转化为简洁直观的用户界面。</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span class="faq-question-text">03 &nbsp; 如何联系你？</span>
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">可以通过页面底部的 Email 链接发送邮件，或在 GitHub / Twitter 上找到我。通常在 1-2 个工作日内回复。</div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
   <footer id="footer"></footer>
   <script>
@@ -450,6 +549,27 @@
     }
 
     setTimeout(typeRole, 1000);
+
+    // FAQ 折叠
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const answer = item.querySelector('.faq-answer');
+        const isOpen = item.classList.contains('open');
+
+        // 关闭所有
+        document.querySelectorAll('.faq-item').forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('.faq-answer').style.maxHeight = '0';
+        });
+
+        // 如果原来是关闭的，则打开
+        if (!isOpen) {
+          item.classList.add('open');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        }
+      });
+    });
   </script>
 </body>
 </html>
