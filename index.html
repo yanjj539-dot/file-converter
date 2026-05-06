@@ -89,10 +89,90 @@
 
   /* 所有内容层级高于背景 */
   nav, main, footer { position: relative; z-index: 1; }
+
+  /* ── 导航栏 ── */
+  #navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s, backdrop-filter 0.3s;
+    z-index: 100;
+  }
+
+  #navbar.scrolled {
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .nav-logo-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-end));
+    border-radius: 7px;
+    flex-shrink: 0;
+  }
+
+  .nav-logo-name {
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-lang {
+    background: rgba(99,102,241,0.12);
+    border: 1px solid var(--border-accent);
+    color: var(--accent);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
-  <nav id="navbar"></nav>
+  <nav id="navbar">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon"></div>
+      <span class="nav-logo-name">Alex Chen</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">关于</a></li>
+      <li><a href="#about">技能</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#footer">联系</a></li>
+      <li><span class="nav-lang">EN</span></li>
+    </ul>
+  </nav>
   <main>
     <section id="hero"></section>
     <section id="about"></section>
@@ -100,7 +180,10 @@
   </main>
   <footer id="footer"></footer>
   <script>
-    // JS will be added in later tasks
+    // 导航毛玻璃
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+    });
   </script>
 </body>
 </html>
