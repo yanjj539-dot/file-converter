@@ -15,6 +15,8 @@
     --border: rgba(255,255,255,0.06);
     --border-accent: rgba(99,102,241,0.3);
     --accent: #818cf8;
+    --primary-shadow: rgba(99,102,241,0.4);
+    --border-subtle: rgba(255,255,255,0.12);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -221,13 +223,13 @@
 
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(99,102,241,0.35);
+    box-shadow: 0 8px 24px var(--primary-shadow);
   }
 
   .btn-secondary {
     background: transparent;
     color: var(--text-secondary);
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid var(--border-subtle);
     padding: 11px 28px;
     border-radius: 8px;
     font-size: 14px;
