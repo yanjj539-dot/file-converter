@@ -157,6 +157,120 @@
     letter-spacing: 1px;
     cursor: pointer;
   }
+
+  /* ── Hero ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 24px 60px;
+  }
+
+  .hero-badge {
+    margin-bottom: 24px;
+  }
+
+  .hero-title {
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin-bottom: 14px;
+  }
+
+  .hero-subtitle {
+    color: var(--text-secondary);
+    font-size: clamp(14px, 2vw, 18px);
+    margin-bottom: 10px;
+  }
+
+  .hero-desc {
+    color: var(--text-muted);
+    font-size: 14px;
+    max-width: 480px;
+    margin: 0 auto 32px;
+    line-height: 1.7;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 56px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-end));
+    color: #fff;
+    border: none;
+    padding: 11px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99,102,241,0.35);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 11px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-accent);
+    color: var(--text);
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .stat-divider {
+    width: 1px;
+    height: 36px;
+    background: var(--border);
+  }
 </style>
 </head>
 <body>
@@ -174,7 +288,36 @@
     </ul>
   </nav>
   <main>
-    <section id="hero"></section>
+    <section id="hero">
+      <div class="hero-badge">
+        <span class="tag">PORTFOLIO · 2026</span>
+      </div>
+      <h1 class="hero-title">
+        Hi, I'm <span class="gradient-text" id="typed-name">Alex Chen</span><span class="cursor">_</span>
+      </h1>
+      <p class="hero-subtitle" id="typed-role">设计师 · 开发者 · 创造者</p>
+      <p class="hero-desc">用代码和设计构建有温度的数字体验，专注于 UI/UX 与前端开发。</p>
+      <div class="hero-cta">
+        <a href="#footer" class="btn-primary">联系我 →</a>
+        <a href="#" class="btn-secondary">查看简历</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-number gradient-text">3+</div>
+          <div class="stat-label">年经验</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-number gradient-text">20+</div>
+          <div class="stat-label">完成项目</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-number gradient-text">∞</div>
+          <div class="stat-label">创造热情</div>
+        </div>
+      </div>
+    </section>
     <section id="about"></section>
     <section id="faq"></section>
   </main>
@@ -184,6 +327,36 @@
     window.addEventListener('scroll', () => {
       document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
     });
+
+    // 打字机动效
+    const roles = ['设计师', '开发者', '创造者', 'Designer', 'Developer'];
+    let roleIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
+    const roleEl = document.getElementById('typed-role');
+
+    function typeRole() {
+      const current = roles[roleIndex];
+      if (!deleting) {
+        roleEl.textContent = current.slice(0, charIndex + 1);
+        charIndex++;
+        if (charIndex === current.length) {
+          deleting = true;
+          setTimeout(typeRole, 1800);
+          return;
+        }
+      } else {
+        roleEl.textContent = current.slice(0, charIndex - 1);
+        charIndex--;
+        if (charIndex === 0) {
+          deleting = false;
+          roleIndex = (roleIndex + 1) % roles.length;
+        }
+      }
+      setTimeout(typeRole, deleting ? 60 : 100);
+    }
+
+    setTimeout(typeRole, 1000);
   </script>
 </body>
 </html>
