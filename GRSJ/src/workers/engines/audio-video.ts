@@ -1,15 +1,16 @@
 import type { ConversionEngine } from './types';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
-let ffmpeg: FFmpeg | null = null;
+let ffmpeg: any = null;
 
-async function getFFmpeg(): Promise<FFmpeg> {
+async function getFFmpeg() {
   if (ffmpeg && ffmpeg.loaded) return ffmpeg;
+
+  const { FFmpeg } = await import('@ffmpeg/ffmpeg');
+  const { toBlobURL } = await import('@ffmpeg/util');
 
   ffmpeg = new FFmpeg();
 
-  ffmpeg.on('progress', ({ progress }) => {
+  ffmpeg.on('progress', ({ progress }: { progress: number }) => {
     // progress is 0-1
   });
 
@@ -32,15 +33,12 @@ export const audioVideoEngine: ConversionEngine = {
     const inputName = `input.${inputExt}`;
     const outputName = `output.${outputExt}`;
 
-    // Write input
     await ff.writeFile(inputName, new Uint8Array(fileBuffer));
     onProgress(15);
 
-    // Execute conversion
     await ff.exec(['-i', inputName, '-progress', 'pipe:1', outputName]);
     onProgress(90);
 
-    // Read output
     const data = await ff.readFile(outputName);
     onProgress(100);
 

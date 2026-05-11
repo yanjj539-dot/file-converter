@@ -1,9 +1,4 @@
 import type { ConversionEngine } from './types';
-import mammoth from 'mammoth';
-import { PDFDocument } from 'pdf-lib';
-import { unified } from 'unified';
-import remarkParse from 'remark-parse';
-import remarkHtml from 'remark-html';
 
 export const documentEngine: ConversionEngine = {
   async convert(fileBuffer, sourceFormat, targetFormat, onProgress) {
@@ -11,6 +6,7 @@ export const documentEngine: ConversionEngine = {
 
     // DOCX → anything
     if (sourceFormat === 'docx') {
+      const mammoth = await import('mammoth');
       const result = await mammoth.convertToHtml({ arrayBuffer: fileBuffer });
       onProgress(50);
       const html = result.value;
@@ -35,6 +31,9 @@ export const documentEngine: ConversionEngine = {
     if (sourceFormat === 'md') {
       const mdText = new TextDecoder().decode(fileBuffer);
       onProgress(30);
+      const { unified } = await import('unified');
+      const remarkParse = (await import('remark-parse')).default;
+      const remarkHtml = (await import('remark-html')).default;
       const html = String(await unified().use(remarkParse).use(remarkHtml).process(mdText));
       onProgress(60);
 
@@ -117,8 +116,9 @@ function escapeHtml(text: string): string {
 }
 
 async function textToPdf(content: string, inputType: 'html' | 'text'): Promise<ArrayBuffer> {
+  const { PDFDocument } = await import('pdf-lib');
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // A4
+  const page = pdfDoc.addPage([595, 842]);
   const fontSize = 12;
   const lineHeight = fontSize * 1.5;
   const margin = 50;
