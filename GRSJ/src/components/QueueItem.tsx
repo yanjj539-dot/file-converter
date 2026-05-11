@@ -10,6 +10,7 @@ interface QueueItemProps {
   task: ConversionTask;
   onFormatChange: (id: string, format: string) => void;
   onSetOptions: (id: string, options: Partial<ConversionOptions>) => void;
+  fileRef?: File;
   onRemove: (id: string) => void;
 }
 
@@ -19,7 +20,7 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function QueueItem({ task, onFormatChange, onSetOptions, onRemove }: QueueItemProps) {
+export default function QueueItem({ task, onFormatChange, onSetOptions, fileRef, onRemove }: QueueItemProps) {
   const [showSettings, setShowSettings] = useState(false);
   const isPending = task.status === 'pending';
 
@@ -87,26 +88,43 @@ export default function QueueItem({ task, onFormatChange, onSetOptions, onRemove
         </div>
       </div>
       {isPending && showSettings && (
-        <QualitySettings task={task} onChange={(opts) => onSetOptions(task.id, opts)} />
+        <QualitySettings task={task} fileRef={fileRef} onChange={(opts) => onSetOptions(task.id, opts)} />
       )}
     </div>
   );
 }
 
-function QualitySettings({ task, onChange }: {
-  task: ConversionTask; onChange: (opts: Partial<ConversionOptions>) => void;
+function QualitySettings({ task, fileRef, onChange }: {
+  task: ConversionTask; fileRef?: File; onChange: (opts: Partial<ConversionOptions>) => void;
 }) {
   const opts = task.options;
   const isImage = task.sourceType === 'image';
   const isVideo = task.sourceType === 'video';
   const isAudio = task.sourceType === 'audio';
   const isDoc = task.sourceType === 'document';
+  const [estimatedSize, setEstimatedSize] = useState<number | null>(null);
 
   const selectClass = "text-caption bg-canvas border border-hairline rounded-md px-2 py-1.5 w-full outline-none focus:border-coral";
   const labelClass = "text-caption text-muted block mb-1";
 
+  // Estimate image output size using Canvas encode
+  const estimateImageSize = async (quality: number) => {
+    if (!fileRef) return;
+    try {
+      const blob = new Blob([await fileRef.arrayBuffer()]);
+      const img = await createImageBitmap(blob);
+      const canvas = new OffscreenCanvas(img.width, img.height);
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0);
+      const mimeType = task.targetFormat === 'jpg' ? 'image/jpeg' : `image/${task.targetFormat}`;
+      const outBlob = await canvas.convertToBlob({ type: mimeType, quality: Math.min(quality / 100, 0.99) });
+      setEstimatedSize(outBlob.size);
+    } catch { setEstimatedSize(null); }
+  };
+
   return (
     <div className="px-4 pb-3 border-t border-hairline pt-3 space-y-3">
+      {/* Quality slider */}
       {(isImage || isVideo) && (
         <div>
           <label className="flex justify-between text-caption text-muted mb-1">
@@ -114,43 +132,85 @@ function QualitySettings({ task, onChange }: {
             <span className="font-medium text-ink">{opts.quality}%</span>
           </label>
           <input type="range" min="10" max="100" value={opts.quality}
-            onChange={(e) => onChange({ quality: Number(e.target.value) })}
+            onChange={(e) => {
+              const q = Number(e.target.value);
+              onChange({ quality: q });
+              if (isImage) {
+                const t = setTimeout(() => estimateImageSize(q), 120);
+                return () => clearTimeout(t);
+              }
+            }}
             className="w-full h-1.5 rounded-full appearance-none bg-hairline cursor-pointer accent-coral" />
+          {estimatedSize !== null && (
+            <div className="mt-1 text-[11px] text-muted">
+              预估输出: <span className="font-medium text-ink">{formatSize(estimatedSize)}</span>
+              {task.fileSize > 0 && (
+                <span className="ml-1 text-success">
+                  -{Math.round((1 - estimatedSize / task.fileSize) * 100)}%
+                </span>
+              )}
+            </div>
+          )}
           <div className="flex justify-between text-[10px] text-muted-soft">
             <span>小文件</span><span>高质量</span>
           </div>
         </div>
       )}
+
       {isImage && (
         <div>
           <label className={labelClass}>分辨率</label>
           <select value={opts.videoResolution} onChange={(e) => onChange({ videoResolution: e.target.value })} className={selectClass}>
             <option value="original">原始尺寸</option>
-            <option value="3840x2160">4K (3840×2160)</option>
-            <option value="2560x1440">2K (2560×1440)</option>
             <option value="1920x1080">1080p (1920×1080)</option>
             <option value="1280x720">720p (1280×720)</option>
             <option value="800x600">800×600</option>
           </select>
         </div>
       )}
+
       {isVideo && (
-        <div>
-          <label className={labelClass}>输出分辨率</label>
-          <select value={opts.videoResolution} onChange={(e) => onChange({ videoResolution: e.target.value })} className={selectClass}>
-            <option value="original">原始分辨率</option>
-            <option value="3840x2160">4K</option>
-            <option value="2560x1440">2K</option>
-            <option value="1920x1080">1080p</option>
-            <option value="1280x720">720p</option>
-            <option value="720x480">480p</option>
-          </select>
-        </div>
+        <>
+          <div>
+            <label className={labelClass}>输出分辨率</label>
+            <select value={opts.videoResolution} onChange={(e) => onChange({ videoResolution: e.target.value })} className={selectClass}>
+              <option value="original">原始分辨率</option>
+              <option value="1920x1080">1080p</option>
+              <option value="1280x720">720p</option>
+              <option value="720x480">480p</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelClass}>音频比特率</label>
+            <select value={opts.audioBitrate} onChange={(e) => {
+              onChange({ audioBitrate: e.target.value });
+              const kbps = parseInt(e.target.value); if (kbps && fileRef) { const ratio = kbps / 192; setEstimatedSize(Math.round(task.fileSize * (opts.quality / 100) * ratio)); }
+            }} className={selectClass}>
+              <option value="320k">320 kbps (最高)</option>
+              <option value="256k">256 kbps (高)</option>
+              <option value="192k">192 kbps (标准)</option>
+              <option value="128k">128 kbps (经济)</option>
+              <option value="96k">96 kbps (最小)</option>
+            </select>
+            {estimatedSize !== null && (
+              <div className="mt-1 text-[11px] text-muted">
+                预估输出: <span className="font-medium text-ink">{formatSize(estimatedSize)}</span>
+                {task.fileSize > 0 && estimatedSize < task.fileSize && (
+                  <span className="ml-1 text-success">-{Math.round((1 - estimatedSize / task.fileSize) * 100)}%</span>
+                )}
+              </div>
+            )}
+          </div>
+        </>
       )}
-      {(isAudio || isVideo) && (
+
+      {isAudio && (
         <div>
           <label className={labelClass}>音频比特率</label>
-          <select value={opts.audioBitrate} onChange={(e) => onChange({ audioBitrate: e.target.value })} className={selectClass}>
+          <select value={opts.audioBitrate} onChange={(e) => {
+            onChange({ audioBitrate: e.target.value });
+            const kbps = parseInt(e.target.value); if (kbps && fileRef) { const ratio = kbps / 192; setEstimatedSize(Math.round(task.fileSize * (opts.quality / 100) * ratio)); }
+          }} className={selectClass}>
             <option value="320k">320 kbps (最高)</option>
             <option value="256k">256 kbps (高)</option>
             <option value="192k">192 kbps (标准)</option>
@@ -158,8 +218,14 @@ function QualitySettings({ task, onChange }: {
             <option value="96k">96 kbps (最小)</option>
             <option value="64k">64 kbps (极低)</option>
           </select>
+          {estimatedSize !== null && (
+            <div className="mt-1 text-[11px] text-muted">
+              预估输出: <span className="font-medium text-ink">{formatSize(estimatedSize)}</span>
+            </div>
+          )}
         </div>
       )}
+
       {isDoc && task.targetFormat === 'pdf' && (
         <div>
           <label className="flex justify-between text-caption text-muted mb-1">

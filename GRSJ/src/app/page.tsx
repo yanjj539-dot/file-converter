@@ -23,7 +23,7 @@ function SpikeMark({ className }: { className?: string }) {
 }
 
 export default function Home() {
-  const { tasks, addFiles, updateTargetFormat, setOptions, removeTask, clearTasks, startAll } = useConversionQueue();
+  const { tasks, addFiles, updateTargetFormat, setOptions, getFile, removeTask, clearTasks, startAll } = useConversionQueue();
   const { entries, isOpen, setIsOpen, addEntry, remove: removeHistory, clear: clearHistory } = useHistory();
 
   const handleClearCompleted = useCallback(() => {
@@ -89,7 +89,7 @@ export default function Home() {
 
         <ConversionQueue
           tasks={tasks} onFormatChange={updateTargetFormat} onSetOptions={setOptions}
-          onRemove={removeTask} onStartAll={startAll} onClear={handleClearCompleted}
+          getFile={getFile} onRemove={removeTask} onStartAll={startAll} onClear={handleClearCompleted}
         />
 
         {tasks.length > 0 && tasks.every(t => t.status === 'done') && (

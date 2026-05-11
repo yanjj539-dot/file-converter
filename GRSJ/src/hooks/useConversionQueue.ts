@@ -526,5 +526,7 @@ export function useConversionQueue() {
     }
   }, [tasks, startConversion]);
 
-  return { tasks, addFiles, updateTargetFormat, setOptions, removeTask, clearTasks, startConversion, startAll };
+  const getFile = useCallback((taskId: string) => fileMap.get(taskId), [fileMap]);
+
+  return { tasks, addFiles, updateTargetFormat, setOptions, getFile, removeTask, clearTasks, startConversion, startAll };
 }

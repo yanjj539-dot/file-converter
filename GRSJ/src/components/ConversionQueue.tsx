@@ -7,13 +7,14 @@ interface ConversionQueueProps {
   tasks: ConversionTask[];
   onFormatChange: (id: string, format: string) => void;
   onSetOptions: (id: string, options: Partial<ConversionOptions>) => void;
+  getFile: (id: string) => File | undefined;
   onRemove: (id: string) => void;
   onStartAll: () => void;
   onClear: () => void;
 }
 
 export default function ConversionQueue({
-  tasks, onFormatChange, onSetOptions, onRemove, onStartAll, onClear,
+  tasks, onFormatChange, onSetOptions, getFile, onRemove, onStartAll, onClear,
 }: ConversionQueueProps) {
   if (tasks.length === 0) return null;
   const pendingCount = tasks.filter(t => t.status === 'pending').length;
@@ -35,8 +36,7 @@ export default function ConversionQueue({
           )}
           {doneCount > 0 && (
             <button onClick={onClear}
-              className="text-button text-muted px-4 rounded-md bg-canvas border border-hairline
-                         hover:text-error transition-colors"
+              className="text-button text-muted px-4 rounded-md bg-canvas border border-hairline hover:text-error transition-colors"
               style={{ height: '40px' }}>
               清除已完成
             </button>
@@ -46,7 +46,8 @@ export default function ConversionQueue({
       <div className="flex flex-col gap-2">
         {tasks.map(task => (
           <QueueItem key={task.id} task={task}
-            onFormatChange={onFormatChange} onSetOptions={onSetOptions} onRemove={onRemove} />
+            onFormatChange={onFormatChange} onSetOptions={onSetOptions}
+            fileRef={getFile(task.id)} onRemove={onRemove} />
         ))}
       </div>
     </div>
