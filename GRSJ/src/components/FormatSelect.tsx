@@ -9,20 +9,16 @@ interface FormatSelectProps {
 export default function FormatSelect({ task, onChange }: FormatSelectProps) {
   const targets = getTargetFormats(task.sourceFormat);
   if (task.status !== 'pending') {
-    return <span className="text-sm text-[var(--color-text-secondary)]">{task.targetFormat.toUpperCase()}</span>;
+    return <span className="text-body-sm text-muted">{task.targetFormat.toUpperCase()}</span>;
   }
-
   return (
     <select
       value={task.targetFormat}
       onChange={(e) => onChange(e.target.value)}
-      className="text-sm bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-btn)]
-                 px-2 py-1 text-[var(--color-text-primary)] outline-none
-                 focus:border-[var(--color-accent)] transition-colors"
+      className="text-body-sm bg-canvas border border-hairline rounded-md
+                 px-2 py-1 text-ink outline-none focus:border-coral transition-colors"
     >
-      {targets.map(f => (
-        <option key={f.extension} value={f.extension}>{f.label}</option>
-      ))}
+      {targets.map(f => <option key={f.extension} value={f.extension}>{f.label}</option>)}
     </select>
   );
 }

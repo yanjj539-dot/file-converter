@@ -33,7 +33,7 @@ export default function Home() {
   }, [tasks, addEntry, removeTask]);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)]">
+    <div className="min-h-screen bg-canvas">
       <Header historyCount={entries.length} onHistoryClick={() => setIsOpen(true)} />
 
       <main className="max-w-2xl mx-auto px-4 py-12">
@@ -52,8 +52,8 @@ export default function Home() {
           <div className="mt-4 flex justify-center">
             <button
               onClick={() => downloadBatch(tasks, `converted-${Date.now()}`)}
-              className="text-sm font-medium px-4 py-2 rounded-[var(--radius-btn)]
-                         bg-[var(--color-accent)] text-white hover:opacity-90 transition-opacity"
+              className="text-button text-white px-6 rounded-md bg-coral hover:bg-coral-active transition-colors"
+              style={{ height: '40px' }}
             >
               打包下载全部 ({tasks.length} 个文件)
             </button>

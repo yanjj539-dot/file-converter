@@ -1,66 +1,61 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-bg: #fafafa;
-  --color-card: #ffffff;
-  --color-accent: #2563eb;
-  --color-accent-secondary: #6366f1;
-  --color-success: #16a34a;
-  --color-warning: #f59e0b;
-  --color-error: #dc2626;
-  --color-text-primary: #111827;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #d1d5db;
-  --color-border: #e5e7eb;
-  --radius-container: 16px;
-  --radius-card: 12px;
-  --radius-btn: 8px;
+  --color-canvas: #faf9f5;
+  --color-ink: #141413;
+  --color-body: #3d3d3a;
+  --color-muted: #6c6a64;
+  --color-muted-soft: #8e8b82;
+  --color-hairline: #e6dfd8;
+  --color-surface-soft: #f5f0e8;
+  --color-surface-card: #efe9de;
+  --color-surface-cream-strong: #e8e0d2;
+  --color-surface-dark: #181715;
+  --color-surface-dark-elevated: #252320;
+  --color-surface-dark-soft: #1f1e1b;
+  --color-coral: #cc785c;
+  --color-coral-active: #a9583e;
+  --color-coral-disabled: #e6dfd8;
+  --color-accent-teal: #5db8a6;
+  --color-accent-amber: #e8a55a;
+  --color-success: #5db872;
+  --color-warning: #d4a017;
+  --color-error: #c64545;
+  --rounded-xs: 4px;
+  --rounded-sm: 6px;
+  --rounded-md: 8px;
+  --rounded-lg: 12px;
+  --rounded-xl: 16px;
+  --rounded-pill: 9999px;
+  --font-display: 'Tiempos Headline', Garamond, 'Times New Roman', serif;
   --font-sans: 'Inter', system-ui, sans-serif;
-}
-
-.dark {
-  --color-bg: #0a0a0a;
-  --color-card: #171717;
-  --color-accent: #3b82f6;
-  --color-accent-secondary: #818cf8;
-  --color-text-primary: #fafafa;
-  --color-text-secondary: #a3a3a3;
-  --color-text-muted: #525252;
-  --color-border: #262626;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 @layer base {
   body {
-    background-color: var(--color-bg);
-    color: var(--color-text-primary);
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
     font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
     transition: background-color 200ms ease-out, color 200ms ease-out;
   }
 }
 
+/* ====== Animations ====== */
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(200%); }
 }
-
 @keyframes breathe {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
 }
-
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-
-.animate-shimmer {
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-.animate-breathe {
-  animation: breathe 2s ease-in-out infinite;
-}
-
-.animate-spin-icon {
-  animation: spin 1s linear infinite;
-}
+.animate-shimmer { animation: shimmer 1.5s ease-in-out infinite; }
+.animate-breathe { animation: breathe 2s ease-in-out infinite; }
+.animate-spin-icon { animation: spin 1s linear infinite; }

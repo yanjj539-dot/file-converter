@@ -39,22 +39,18 @@ export default function DropZone({ onFilesAdded }: DropZoneProps) {
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
       className={`
-        relative cursor-pointer rounded-[var(--radius-container)]
-        border-2 border-dashed transition-all duration-200
+        relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200
         flex flex-col items-center justify-center gap-3
         ${isDragging
-          ? 'border-[var(--color-accent)] bg-[#EFF6FF] dark:bg-[#1E3A5F] scale-[1.01]'
-          : 'border-[var(--color-text-muted)] hover:border-[var(--color-text-secondary)]'
+          ? 'border-coral bg-surface-soft scale-[1.01]'
+          : 'border-muted-soft hover:border-muted'
         }
       `}
       style={{ padding: 'clamp(40px, 8vh, 80px) clamp(20px, 4vw, 40px)' }}
     >
       <div className={`
         w-14 h-14 rounded-full flex items-center justify-center
-        ${isDragging
-          ? 'bg-[var(--color-accent)] text-white'
-          : 'bg-[var(--color-bg)] text-[var(--color-text-muted)]'
-        }
+        ${isDragging ? 'bg-coral text-white' : 'bg-surface-card text-muted-soft'}
         transition-colors duration-200
       `}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -64,10 +60,10 @@ export default function DropZone({ onFilesAdded }: DropZoneProps) {
         </svg>
       </div>
       <div className="text-center">
-        <p className="text-[15px] font-medium text-[var(--color-text-primary)]">
+        <p className="font-display text-title-md text-ink">
           {isDragging ? '松开以上传文件' : '拖拽文件到此处'}
         </p>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+        <p className="text-body-sm text-muted mt-1">
           或点击选择 &middot; 支持图片 · 文档 · 音视频
         </p>
       </div>
