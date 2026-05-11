@@ -157,29 +157,18 @@ async function convertDocument(
 }
 
 // ====== Audio/Video ======
-// FFmpeg loaded via CDN script to bypass Turbopack static export dynamic import bug
+// FFmpeg loaded from public/ to bypass Turbopack static export dynamic import limitations
 let ffmpegInstance: any = null;
 let ffmpegPromise: Promise<any> | null = null;
-
-function loadScript(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error(`Failed to load: ${src}`));
-    document.head.appendChild(s);
-  });
-}
 
 async function getFFmpeg(): Promise<any> {
   if (ffmpegInstance?.loaded) return ffmpegInstance;
   if (ffmpegPromise) return ffmpegPromise;
   ffmpegPromise = (async () => {
-    await loadScript('https://unpkg.com/@ffmpeg/util@0.12.2/dist/umd/index.js');
-    await loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js');
-    const FFmpegClass = (window as any).FFmpegWASM?.FFmpeg || (window as any).FFmpeg;
-    if (!FFmpegClass) throw new Error('FFmpeg 加载失败，请检查网络连接');
-    ffmpegInstance = new FFmpegClass();
+    // Use indirect eval to bypass Turbopack static analysis
+    const dynamicImport = new Function('url', 'return import(url)') as (url: string) => Promise<any>;
+    const { FFmpeg } = await dynamicImport('/ffmpeg/ffmpeg/index.js');
+    ffmpegInstance = new FFmpeg();
     await ffmpegInstance.load({
       coreURL: '/ffmpeg/ffmpeg-core.js',
       wasmURL: '/ffmpeg/ffmpeg-core.wasm',
