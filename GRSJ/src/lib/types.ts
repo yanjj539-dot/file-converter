@@ -2,6 +2,12 @@ export type FileCategory = 'image' | 'document' | 'audio' | 'video';
 
 export type TaskStatus = 'pending' | 'converting' | 'done' | 'error';
 
+export interface ConversionOptions {
+  quality: number;           // 1-100, 图片质量 / 视频CRF映射
+  audioBitrate: string;      // 音频比特率 "128k" "192k" "256k" "320k"
+  videoResolution: string;   // "original" "1920x1080" "1280x720" "720x480"
+}
+
 export interface ConversionTask {
   id: string;
   fileName: string;
@@ -14,6 +20,7 @@ export interface ConversionTask {
   resultBlobUrl: string | null;
   error: string | null;
   createdAt: number;
+  options: ConversionOptions;
 }
 
 export interface HistoryEntry {

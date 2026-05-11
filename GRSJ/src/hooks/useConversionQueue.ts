@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import type { ConversionTask } from '@/lib/types';
+import type { ConversionTask, ConversionOptions } from '@/lib/types';
 import { detectCategory, getTargetFormats } from '@/lib/formats';
 
 // Image engines — heic2any loaded dynamically (references window)
@@ -19,14 +19,17 @@ let taskCounter = 0;
 
 // ====== Image ======
 async function convertImage(
-  fileBuffer: ArrayBuffer, sourceFormat: string, targetFormat: string, onProgress: (p: number) => void
+  fileBuffer: ArrayBuffer, sourceFormat: string, targetFormat: string,
+  onProgress: (p: number) => void, options: ConversionOptions
 ): Promise<ArrayBuffer> {
   onProgress(10);
   const blob = new Blob([fileBuffer]);
+  const quality = (options.quality ?? 92) / 100;
+
   if (sourceFormat === 'heic') {
     const { default: heic2any } = await import('heic2any');
     onProgress(30);
-    const result = await heic2any({ blob, toType: `image/${targetFormat}` });
+    const result = await heic2any({ blob, toType: `image/${targetFormat}`, quality });
     onProgress(80);
     const outBlob = Array.isArray(result) ? result[0] : result;
     return await (outBlob as Blob).arrayBuffer();
@@ -34,11 +37,23 @@ async function convertImage(
   onProgress(30);
   const mimeType = targetFormat === 'jpg' ? 'image/jpeg' : `image/${targetFormat}`;
   const img = await createImageBitmap(blob);
-  const canvas = new OffscreenCanvas(img.width, img.height);
+  let w = img.width, h = img.height;
+
+  // Resize if max dimensions are set
+  if (options.videoResolution && options.videoResolution !== 'original') {
+    const [maxW, maxH] = options.videoResolution.split('x').map(Number);
+    if (maxW && maxH && (w > maxW || h > maxH)) {
+      const ratio = Math.min(maxW / w, maxH / h);
+      w = Math.round(w * ratio);
+      h = Math.round(h * ratio);
+    }
+  }
+
+  const canvas = new OffscreenCanvas(w, h);
   const ctx = canvas.getContext('2d')!;
-  ctx.drawImage(img, 0, 0);
+  ctx.drawImage(img, 0, 0, w, h);
   onProgress(70);
-  const outBlob = await canvas.convertToBlob({ type: mimeType, quality: 0.92 });
+  const outBlob = await canvas.convertToBlob({ type: mimeType, quality });
   return await outBlob.arrayBuffer();
 }
 
@@ -78,10 +93,9 @@ function wrapText(text: string, fontSize: number, maxWidth: number): string[] {
   if (currentLine) lines.push(currentLine);
   return lines;
 }
-async function textToPdf(content: string, inputType: 'html' | 'text'): Promise<ArrayBuffer> {
+async function textToPdf(content: string, inputType: 'html' | 'text', fontSize: number = 12): Promise<ArrayBuffer> {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]);
-  const fontSize = 12;
   const lineHeight = fontSize * 1.5;
   const margin = 50;
   const text = inputType === 'html' ? stripHtml(content) : content;
@@ -234,9 +248,12 @@ function stripLatex(tex: string): string {
 }
 
 async function convertDocument(
-  fileBuffer: ArrayBuffer, sourceFormat: string, targetFormat: string, onProgress: (p: number) => void
+  fileBuffer: ArrayBuffer, sourceFormat: string, targetFormat: string,
+  onProgress: (p: number) => void, options: ConversionOptions
 ): Promise<ArrayBuffer> {
   onProgress(10);
+  // Map quality slider (60-150) to font size (8-18)
+  const pdfFontSize = Math.round(8 + ((options.quality - 60) / 90) * 10);
   if (sourceFormat === 'docx') {
     const result = await mammoth.convertToHtml({ arrayBuffer: fileBuffer });
     onProgress(50);
@@ -244,7 +261,7 @@ async function convertDocument(
     if (targetFormat === 'html') return new TextEncoder().encode(html).buffer;
     if (targetFormat === 'txt') return new TextEncoder().encode(stripHtml(html)).buffer;
     if (targetFormat === 'md') return new TextEncoder().encode(htmlToMarkdown(html)).buffer;
-    if (targetFormat === 'pdf') return await textToPdf(html, 'html');
+    if (targetFormat === 'pdf') return await textToPdf(html, 'html', pdfFontSize);
   }
   if (sourceFormat === 'md') {
     const mdText = new TextDecoder().decode(fileBuffer);
@@ -253,7 +270,7 @@ async function convertDocument(
     onProgress(60);
     if (targetFormat === 'html') return new TextEncoder().encode(html).buffer;
     if (targetFormat === 'txt') return new TextEncoder().encode(stripHtml(html)).buffer;
-    if (targetFormat === 'pdf') return await textToPdf(html, 'html');
+    if (targetFormat === 'pdf') return await textToPdf(html, 'html', pdfFontSize);
     if (targetFormat === 'docx') throw new Error('MD → DOCX 暂不支持');
   }
   if (sourceFormat === 'html' || sourceFormat === 'htm') {
@@ -261,7 +278,7 @@ async function convertDocument(
     onProgress(30);
     if (targetFormat === 'txt') return new TextEncoder().encode(stripHtml(htmlText)).buffer;
     if (targetFormat === 'md') return new TextEncoder().encode(htmlToMarkdown(htmlText)).buffer;
-    if (targetFormat === 'pdf') return await textToPdf(htmlText, 'html');
+    if (targetFormat === 'pdf') return await textToPdf(htmlText, 'html', pdfFontSize);
   }
   // CSV → 文本/表格格式
   if (sourceFormat === 'csv') {
@@ -271,7 +288,7 @@ async function convertDocument(
     if (targetFormat === 'json') return csvToJson(csvText);
     if (targetFormat === 'html') return new TextEncoder().encode(csvToHtmlTable(csvText)).buffer;
     if (targetFormat === 'md') return new TextEncoder().encode(csvToMarkdownTable(csvText)).buffer;
-    if (targetFormat === 'pdf') return await textToPdf(csvToHtmlTable(csvText), 'html');
+    if (targetFormat === 'pdf') return await textToPdf(csvToHtmlTable(csvText), 'html', pdfFontSize);
   }
   // JSON → 美化/转换
   if (sourceFormat === 'json') {
@@ -281,7 +298,7 @@ async function convertDocument(
     if (targetFormat === 'txt' || targetFormat === 'json') return new TextEncoder().encode(formatted).buffer;
     if (targetFormat === 'html') return new TextEncoder().encode(`<html><body><pre>${escapeHtml(formatted)}</pre></body></html>`).buffer;
     if (targetFormat === 'md') return new TextEncoder().encode('```json\n' + formatted + '\n```').buffer;
-    if (targetFormat === 'pdf') return await textToPdf(formatted, 'text');
+    if (targetFormat === 'pdf') return await textToPdf(formatted, 'text', pdfFontSize);
   }
   // XML → 文本/格式化
   if (sourceFormat === 'xml') {
@@ -292,7 +309,7 @@ async function convertDocument(
     if (targetFormat === 'html') return new TextEncoder().encode(`<html><body><pre>${escapeHtml(formatted)}</pre></body></html>`).buffer;
     if (targetFormat === 'md') return new TextEncoder().encode('```xml\n' + formatted + '\n```').buffer;
     if (targetFormat === 'json') return xmlToJson(xmlText);
-    if (targetFormat === 'pdf') return await textToPdf(formatted, 'text');
+    if (targetFormat === 'pdf') return await textToPdf(formatted, 'text', pdfFontSize);
   }
   // RTF → 提取纯文本
   if (sourceFormat === 'rtf') {
@@ -302,7 +319,7 @@ async function convertDocument(
     if (targetFormat === 'txt') return new TextEncoder().encode(text).buffer;
     if (targetFormat === 'html') return new TextEncoder().encode(`<html><body><pre>${escapeHtml(text)}</pre></body></html>`).buffer;
     if (targetFormat === 'md') return new TextEncoder().encode(text).buffer;
-    if (targetFormat === 'pdf') return await textToPdf(text, 'text');
+    if (targetFormat === 'pdf') return await textToPdf(text, 'text', pdfFontSize);
   }
   // LaTeX → 纯文本
   if (sourceFormat === 'tex') {
@@ -312,7 +329,7 @@ async function convertDocument(
     if (targetFormat === 'txt') return new TextEncoder().encode(text).buffer;
     if (targetFormat === 'html') return new TextEncoder().encode(`<html><body><pre>${escapeHtml(text)}</pre></body></html>`).buffer;
     if (targetFormat === 'md') return new TextEncoder().encode(text).buffer;
-    if (targetFormat === 'pdf') return await textToPdf(text, 'text');
+    if (targetFormat === 'pdf') return await textToPdf(text, 'text', pdfFontSize);
   }
   // Office 文档（DOC/PPT/XLS/ODT）→ 暂无深度支持，提示
   if (['doc', 'odt', 'pptx', 'ppt', 'xlsx', 'xls', 'epub'].includes(sourceFormat)) {
@@ -325,7 +342,7 @@ async function convertDocument(
       return new TextEncoder().encode(`<html><body><pre>${escapeHtml(text)}</pre></body></html>`).buffer;
     }
     if (targetFormat === 'md') return fileBuffer;
-    if (targetFormat === 'pdf') return await textToPdf(text, 'text');
+    if (targetFormat === 'pdf') return await textToPdf(text, 'text', pdfFontSize);
   }
   if (sourceFormat === 'pdf') {
     const { getDocument } = await import('pdfjs-dist');
@@ -372,7 +389,8 @@ async function getFFmpeg(): Promise<any> {
 }
 
 async function convertAudioVideo(
-  fileBuffer: ArrayBuffer, sourceFormat: string, targetFormat: string, onProgress: (p: number) => void
+  fileBuffer: ArrayBuffer, sourceFormat: string, targetFormat: string,
+  onProgress: (p: number) => void, options: ConversionOptions
 ): Promise<ArrayBuffer> {
   const ff = await getFFmpeg();
   const inputExt = sourceFormat === 'jpg' ? 'jpeg' : sourceFormat;
@@ -381,7 +399,23 @@ async function convertAudioVideo(
   const outputName = `output.${outputExt}`;
   await ff.writeFile(inputName, new Uint8Array(fileBuffer));
   onProgress(15);
-  await ff.exec(['-i', inputName, outputName]);
+
+  const args = ['-i', inputName];
+
+  // Video quality (CRF: lower=better, 18-51, maps from quality 1-100)
+  const crf = Math.round(51 - ((options.quality ?? 78) / 100) * 33);
+  args.push('-crf', String(crf));
+
+  // Video resolution
+  if (options.videoResolution && options.videoResolution !== 'original') {
+    args.push('-vf', `scale=${options.videoResolution}`);
+  }
+
+  // Audio bitrate
+  args.push('-b:a', options.audioBitrate || '192k');
+
+  args.push(outputName);
+  await ff.exec(args);
   onProgress(90);
   const data = await ff.readFile(outputName);
   onProgress(100);
@@ -390,7 +424,8 @@ async function convertAudioVideo(
 
 // ====== Hook ======
 type EngineFn = (
-  fileBuffer: ArrayBuffer, sourceFormat: string, targetFormat: string, onProgress: (p: number) => void
+  fileBuffer: ArrayBuffer, sourceFormat: string, targetFormat: string,
+  onProgress: (p: number) => void, options: ConversionOptions
 ) => Promise<ArrayBuffer>;
 
 export function useConversionQueue() {
@@ -416,6 +451,7 @@ export function useConversionQueue() {
         sourceType: category, sourceFormat: ext, targetFormat,
         status: 'pending', progress: 0, resultBlobUrl: null,
         error: null, createdAt: Date.now(),
+        options: { quality: 85, audioBitrate: '192k', videoResolution: 'original' },
       });
     }
     setTasks(prev => [...prev, ...newTasks]);
@@ -424,6 +460,12 @@ export function useConversionQueue() {
   const updateTargetFormat = useCallback((taskId: string, format: string) => {
     updateTask(taskId, { targetFormat: format });
   }, [updateTask]);
+
+  const setOptions = useCallback((taskId: string, options: Partial<ConversionOptions>) => {
+    setTasks(prev => prev.map(t => t.id === taskId ? {
+      ...t, options: { ...t.options, ...options }
+    } : t));
+  }, []);
 
   const removeTask = useCallback((taskId: string) => {
     fileMap.delete(taskId);
@@ -464,7 +506,8 @@ export function useConversionQueue() {
 
       const resultBuffer = await engine(
         fileBuffer, task.sourceFormat, task.targetFormat,
-        (progress) => updateTask(taskId, { progress })
+        (progress) => updateTask(taskId, { progress }),
+        task.options
       );
 
       const blob = new Blob([resultBuffer]);
@@ -483,5 +526,5 @@ export function useConversionQueue() {
     }
   }, [tasks, startConversion]);
 
-  return { tasks, addFiles, updateTargetFormat, removeTask, clearTasks, startConversion, startAll };
+  return { tasks, addFiles, updateTargetFormat, setOptions, removeTask, clearTasks, startConversion, startAll };
 }

@@ -1,18 +1,19 @@
 'use client';
 
-import type { ConversionTask } from '@/lib/types';
+import type { ConversionTask, ConversionOptions } from '@/lib/types';
 import QueueItem from './QueueItem';
 
 interface ConversionQueueProps {
   tasks: ConversionTask[];
   onFormatChange: (id: string, format: string) => void;
+  onSetOptions: (id: string, options: Partial<ConversionOptions>) => void;
   onRemove: (id: string) => void;
   onStartAll: () => void;
   onClear: () => void;
 }
 
 export default function ConversionQueue({
-  tasks, onFormatChange, onRemove, onStartAll, onClear,
+  tasks, onFormatChange, onSetOptions, onRemove, onStartAll, onClear,
 }: ConversionQueueProps) {
   if (tasks.length === 0) return null;
 
@@ -53,6 +54,7 @@ export default function ConversionQueue({
             key={task.id}
             task={task}
             onFormatChange={onFormatChange}
+            onSetOptions={onSetOptions}
             onRemove={onRemove}
           />
         ))}

@@ -11,7 +11,7 @@ import { downloadBatch } from '@/lib/download';
 
 export default function Home() {
   const {
-    tasks, addFiles, updateTargetFormat, removeTask,
+    tasks, addFiles, updateTargetFormat, setOptions, removeTask,
     clearTasks, startAll,
   } = useConversionQueue();
   const { entries, isOpen, setIsOpen, addEntry, remove: removeHistory, clear: clearHistory } = useHistory();
@@ -42,6 +42,7 @@ export default function Home() {
         <ConversionQueue
           tasks={tasks}
           onFormatChange={updateTargetFormat}
+          onSetOptions={setOptions}
           onRemove={removeTask}
           onStartAll={startAll}
           onClear={handleClearCompleted}
