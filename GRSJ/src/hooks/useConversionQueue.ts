@@ -449,7 +449,7 @@ export function useConversionQueue() {
       newTasks.push({
         id: taskId, fileName: file.name, fileSize: file.size,
         sourceType: category, sourceFormat: ext, targetFormat,
-        status: 'pending', progress: 0, resultBlobUrl: null,
+        status: 'pending', progress: 0, resultBlobUrl: null, resultSize: null,
         error: null, createdAt: Date.now(),
         options: { quality: 85, audioBitrate: '192k', videoResolution: 'original' },
       });
@@ -512,7 +512,7 @@ export function useConversionQueue() {
 
       const blob = new Blob([resultBuffer]);
       const url = URL.createObjectURL(blob);
-      updateTask(taskId, { status: 'done', progress: 100, resultBlobUrl: url });
+      updateTask(taskId, { status: 'done', progress: 100, resultBlobUrl: url, resultSize: blob.size });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       updateTask(taskId, { status: 'error', error: msg || '转换失败' });

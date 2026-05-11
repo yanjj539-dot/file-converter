@@ -18,6 +18,7 @@ export interface ConversionTask {
   status: TaskStatus;
   progress: number;
   resultBlobUrl: string | null;
+  resultSize: number | null;
   error: string | null;
   createdAt: number;
   options: ConversionOptions;

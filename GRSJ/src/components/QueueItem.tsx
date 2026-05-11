@@ -40,6 +40,18 @@ export default function QueueItem({ task, onFormatChange, onSetOptions, onRemove
             <FormatSelect task={task} onChange={(fmt) => onFormatChange(task.id, fmt)} />
           </div>
           {task.status === 'converting' && <div className="mt-2"><ProgressBar progress={task.progress} /></div>}
+          {task.status === 'done' && task.resultSize && (
+            <div className="flex items-center gap-2 mt-1.5">
+              <span className="text-caption text-muted">{formatSize(task.fileSize)}</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" className="text-muted-soft"><path d="M3 6h6M8 3l3 3-3 3"/></svg>
+              <span className="text-caption font-medium text-ink">{formatSize(task.resultSize)}</span>
+              {task.resultSize < task.fileSize && (
+                <span className="text-caption text-success ml-1">
+                  -{Math.round((1 - task.resultSize / task.fileSize) * 100)}%
+                </span>
+              )}
+            </div>
+          )}
           {task.status === 'error' && task.error && <p className="text-caption text-error mt-1">{task.error}</p>}
         </div>
         <div className="flex items-center gap-1 shrink-0">
