@@ -1,26 +1,26 @@
 import type { ConversionEngine } from './types';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { toBlobURL } from '@ffmpeg/util';
 
-let ffmpeg: any = null;
+let ffmpeg: FFmpeg | null = null;
+let ffmpegLoadPromise: Promise<FFmpeg> | null = null;
 
-async function getFFmpeg() {
+async function getFFmpeg(): Promise<FFmpeg> {
   if (ffmpeg && ffmpeg.loaded) return ffmpeg;
+  if (ffmpegLoadPromise) return ffmpegLoadPromise;
 
-  const { FFmpeg } = await import('@ffmpeg/ffmpeg');
-  const { toBlobURL } = await import('@ffmpeg/util');
+  ffmpegLoadPromise = (async () => {
+    ffmpeg = new FFmpeg();
 
-  ffmpeg = new FFmpeg();
+    await ffmpeg.load({
+      coreURL: await toBlobURL(new URL('/ffmpeg/ffmpeg-core.js', self.location.origin).href, 'text/javascript'),
+      wasmURL: await toBlobURL(new URL('/ffmpeg/ffmpeg-core.wasm', self.location.origin).href, 'application/wasm'),
+    });
 
-  ffmpeg.on('progress', ({ progress }: { progress: number }) => {
-    // progress is 0-1
-  });
+    return ffmpeg;
+  })();
 
-  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
-  await ffmpeg.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-  });
-
-  return ffmpeg;
+  return ffmpegLoadPromise;
 }
 
 export const audioVideoEngine: ConversionEngine = {
@@ -36,7 +36,7 @@ export const audioVideoEngine: ConversionEngine = {
     await ff.writeFile(inputName, new Uint8Array(fileBuffer));
     onProgress(15);
 
-    await ff.exec(['-i', inputName, '-progress', 'pipe:1', outputName]);
+    await ff.exec(['-i', inputName, outputName]);
     onProgress(90);
 
     const data = await ff.readFile(outputName);
