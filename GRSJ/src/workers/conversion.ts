@@ -1,4 +1,10 @@
-import type { WorkerRequest } from './engines/types';
+type WorkerRequest = {
+  id: string;
+  sourceType: 'image' | 'document' | 'audio' | 'video';
+  sourceFormat: string;
+  targetFormat: string;
+  fileBuffer: ArrayBuffer;
+};
 
 function postProgress(id: string, progress: number) {
   self.postMessage({ type: 'progress', id, progress });
@@ -20,18 +26,18 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
 
     switch (sourceType) {
       case 'image': {
-        const mod = await import('./engines/image');
+        const mod = await import('@/workers/engines/image');
         engine = mod.imageEngine;
         break;
       }
       case 'document': {
-        const mod = await import('./engines/document');
+        const mod = await import('@/workers/engines/document');
         engine = mod.documentEngine;
         break;
       }
       case 'audio':
       case 'video': {
-        const mod = await import('./engines/audio-video');
+        const mod = await import('@/workers/engines/audio-video');
         engine = mod.audioVideoEngine;
         break;
       }
