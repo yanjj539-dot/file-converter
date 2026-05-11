@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg: #fafafa;
+  --color-card: #ffffff;
+  --color-accent: #2563eb;
+  --color-accent-secondary: #6366f1;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-error: #dc2626;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #d1d5db;
+  --color-border: #e5e7eb;
+  --radius-container: 16px;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+.dark {
+  --color-bg: #0a0a0a;
+  --color-card: #171717;
+  --color-accent: #3b82f6;
+  --color-accent-secondary: #818cf8;
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #525252;
+  --color-border: #262626;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    transition: background-color 200ms ease-out, color 200ms ease-out;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+.animate-spin-icon {
+  animation: spin 1s linear infinite;
+}
