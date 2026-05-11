@@ -95,6 +95,144 @@ async function textToPdf(content: string, inputType: 'html' | 'text'): Promise<A
   return (await pdfDoc.save()).buffer as ArrayBuffer;
 }
 
+// ====== CSV helpers ======
+function csvToHtmlTable(csv: string): string {
+  const rows = csv.trim().split('\n').map(r => parseCSVLine(r));
+  if (!rows.length) return '<table></table>';
+  const headers = rows[0];
+  let html = '<table border="1" style="border-collapse:collapse">\n<thead><tr>';
+  for (const h of headers) html += `<th>${escapeHtml(h)}</th>`;
+  html += '</tr></thead>\n<tbody>';
+  for (let i = 1; i < rows.length; i++) {
+    html += '<tr>';
+    for (const cell of rows[i]) html += `<td>${escapeHtml(cell)}</td>`;
+    html += '</tr>\n';
+  }
+  html += '</tbody></table>';
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${html}</body></html>`;
+}
+function csvToMarkdownTable(csv: string): string {
+  const rows = csv.trim().split('\n').map(r => parseCSVLine(r));
+  if (!rows.length) return '';
+  const headers = rows[0];
+  let md = '| ' + headers.join(' | ') + ' |\n';
+  md += '| ' + headers.map(() => '---').join(' | ') + ' |\n';
+  for (let i = 1; i < rows.length; i++) {
+    md += '| ' + rows[i].join(' | ') + ' |\n';
+  }
+  return md;
+}
+function csvToJson(csv: string): ArrayBuffer {
+  const rows = csv.trim().split('\n').map(r => parseCSVLine(r));
+  if (rows.length < 2) return new TextEncoder().encode('[]').buffer as ArrayBuffer;
+  const headers = rows[0];
+  const result = [];
+  for (let i = 1; i < rows.length; i++) {
+    const obj: Record<string, string> = {};
+    for (let j = 0; j < headers.length; j++) obj[headers[j]] = rows[i][j] || '';
+    result.push(obj);
+  }
+  return new TextEncoder().encode(JSON.stringify(result, null, 2)).buffer as ArrayBuffer;
+}
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '', inQuotes = false;
+  for (const ch of line) {
+    if (inQuotes) {
+      if (ch === '"') inQuotes = false;
+      else current += ch;
+    } else {
+      if (ch === '"') inQuotes = true;
+      else if (ch === ',') { result.push(current.trim()); current = ''; }
+      else current += ch;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+// ====== JSON helper ======
+function prettyJson(raw: string): string {
+  try { return JSON.stringify(JSON.parse(raw), null, 2); }
+  catch { return raw; }
+}
+
+// ====== XML helpers ======
+function prettyXml(xml: string): string {
+  let formatted = '';
+  let indent = 0;
+  const tags = xml.replace(/>\s*</g, '><').split(/>\s*</).map(s => s.replace(/^</, '').replace(/>$/, ''));
+  for (const tag of tags) {
+    const trimmed = tag.trim();
+    if (!trimmed) continue;
+    if (trimmed.startsWith('/')) indent--;
+    if (trimmed.startsWith('?') || trimmed.startsWith('!')) {
+      formatted += '  '.repeat(Math.max(indent, 0)) + '<' + trimmed + '>\n';
+    } else if (trimmed.startsWith('/')) {
+      formatted += '  '.repeat(Math.max(indent, 0)) + '<' + trimmed + '>\n';
+    } else if (trimmed.endsWith('/')) {
+      formatted += '  '.repeat(Math.max(indent, 0)) + '<' + trimmed + '>\n';
+    } else {
+      formatted += '  '.repeat(Math.max(indent, 0)) + '<' + trimmed + '>\n';
+    }
+    if (!trimmed.startsWith('/') && !trimmed.endsWith('/') && !trimmed.startsWith('?') && !trimmed.startsWith('!')) indent++;
+  }
+  return formatted || xml;
+}
+function xmlToJson(xml: string): ArrayBuffer {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xml, 'text/xml');
+    const errorNode = doc.querySelector('parsererror');
+    if (errorNode) throw new Error('Invalid XML');
+    const result = xmlNodeToJson(doc.documentElement);
+    return new TextEncoder().encode(JSON.stringify(result, null, 2)).buffer as ArrayBuffer;
+  } catch {
+    throw new Error('XML 解析失败，请检查文件格式');
+  }
+}
+function xmlNodeToJson(node: Element): any {
+  const obj: any = {};
+  for (const attr of Array.from(node.attributes)) obj['@' + attr.name] = attr.value;
+  for (const child of Array.from(node.children)) {
+    const childJson = xmlNodeToJson(child);
+    const name = child.tagName;
+    if (obj[name]) {
+      if (!Array.isArray(obj[name])) obj[name] = [obj[name]];
+      obj[name].push(childJson);
+    } else {
+      const textNodes = child.childNodes;
+      const hasOnlyText = textNodes.length === 1 && textNodes[0].nodeType === 3;
+      obj[name] = hasOnlyText ? (textNodes[0].textContent || '') : childJson;
+    }
+  }
+  if (Object.keys(obj).length === 0) return node.textContent || '';
+  return obj;
+}
+
+// ====== RTF helper ======
+function stripRtf(rtf: string): string {
+  return rtf
+    .replace(/\\\w+\s?/g, '')
+    .replace(/[{}]/g, '')
+    .replace(/\\'[0-9a-fA-F]{2}/g, '')
+    .replace(/\\par/g, '\n')
+    .replace(/\\tab/g, '\t')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+// ====== LaTeX helper ======
+function stripLatex(tex: string): string {
+  return tex
+    .replace(/\\\w+\{([^}]*)\}/g, '$1')
+    .replace(/\\\w+/g, '')
+    .replace(/[{}]/g, '')
+    .replace(/\$\$?[^$]+\$\$?/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 async function convertDocument(
   fileBuffer: ArrayBuffer, sourceFormat: string, targetFormat: string, onProgress: (p: number) => void
 ): Promise<ArrayBuffer> {
@@ -118,12 +256,67 @@ async function convertDocument(
     if (targetFormat === 'pdf') return await textToPdf(html, 'html');
     if (targetFormat === 'docx') throw new Error('MD → DOCX 暂不支持');
   }
-  if (sourceFormat === 'html') {
+  if (sourceFormat === 'html' || sourceFormat === 'htm') {
     const htmlText = new TextDecoder().decode(fileBuffer);
     onProgress(30);
     if (targetFormat === 'txt') return new TextEncoder().encode(stripHtml(htmlText)).buffer;
     if (targetFormat === 'md') return new TextEncoder().encode(htmlToMarkdown(htmlText)).buffer;
     if (targetFormat === 'pdf') return await textToPdf(htmlText, 'html');
+  }
+  // CSV → 文本/表格格式
+  if (sourceFormat === 'csv') {
+    const csvText = new TextDecoder().decode(fileBuffer);
+    onProgress(30);
+    if (targetFormat === 'txt') return new TextEncoder().encode(csvText).buffer;
+    if (targetFormat === 'json') return csvToJson(csvText);
+    if (targetFormat === 'html') return new TextEncoder().encode(csvToHtmlTable(csvText)).buffer;
+    if (targetFormat === 'md') return new TextEncoder().encode(csvToMarkdownTable(csvText)).buffer;
+    if (targetFormat === 'pdf') return await textToPdf(csvToHtmlTable(csvText), 'html');
+  }
+  // JSON → 美化/转换
+  if (sourceFormat === 'json') {
+    const jsonText = new TextDecoder().decode(fileBuffer);
+    onProgress(30);
+    const formatted = prettyJson(jsonText);
+    if (targetFormat === 'txt' || targetFormat === 'json') return new TextEncoder().encode(formatted).buffer;
+    if (targetFormat === 'html') return new TextEncoder().encode(`<html><body><pre>${escapeHtml(formatted)}</pre></body></html>`).buffer;
+    if (targetFormat === 'md') return new TextEncoder().encode('```json\n' + formatted + '\n```').buffer;
+    if (targetFormat === 'pdf') return await textToPdf(formatted, 'text');
+  }
+  // XML → 文本/格式化
+  if (sourceFormat === 'xml') {
+    const xmlText = new TextDecoder().decode(fileBuffer);
+    onProgress(30);
+    const formatted = prettyXml(xmlText);
+    if (targetFormat === 'txt') return new TextEncoder().encode(formatted).buffer;
+    if (targetFormat === 'html') return new TextEncoder().encode(`<html><body><pre>${escapeHtml(formatted)}</pre></body></html>`).buffer;
+    if (targetFormat === 'md') return new TextEncoder().encode('```xml\n' + formatted + '\n```').buffer;
+    if (targetFormat === 'json') return xmlToJson(xmlText);
+    if (targetFormat === 'pdf') return await textToPdf(formatted, 'text');
+  }
+  // RTF → 提取纯文本
+  if (sourceFormat === 'rtf') {
+    const rtfText = new TextDecoder().decode(fileBuffer);
+    const text = stripRtf(rtfText);
+    onProgress(50);
+    if (targetFormat === 'txt') return new TextEncoder().encode(text).buffer;
+    if (targetFormat === 'html') return new TextEncoder().encode(`<html><body><pre>${escapeHtml(text)}</pre></body></html>`).buffer;
+    if (targetFormat === 'md') return new TextEncoder().encode(text).buffer;
+    if (targetFormat === 'pdf') return await textToPdf(text, 'text');
+  }
+  // LaTeX → 纯文本
+  if (sourceFormat === 'tex') {
+    const texText = new TextDecoder().decode(fileBuffer);
+    const text = stripLatex(texText);
+    onProgress(50);
+    if (targetFormat === 'txt') return new TextEncoder().encode(text).buffer;
+    if (targetFormat === 'html') return new TextEncoder().encode(`<html><body><pre>${escapeHtml(text)}</pre></body></html>`).buffer;
+    if (targetFormat === 'md') return new TextEncoder().encode(text).buffer;
+    if (targetFormat === 'pdf') return await textToPdf(text, 'text');
+  }
+  // Office 文档（DOC/PPT/XLS/ODT）→ 暂无深度支持，提示
+  if (['doc', 'odt', 'pptx', 'ppt', 'xlsx', 'xls', 'epub'].includes(sourceFormat)) {
+    throw new Error(`${sourceFormat.toUpperCase()} 格式暂不支持深度转换，建议先导出为 PDF 或 TXT 后再转换`);
   }
   if (sourceFormat === 'txt') {
     const text = new TextDecoder().decode(fileBuffer);
