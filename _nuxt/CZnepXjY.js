@@ -1,1 +1,0 @@
-import{C as s,D as u,E as r,G as o,H as c,I as i}from"./CCiZsG-w.js";function a(t){const e=t||u();return e?.ssrContext?.head||e?.runWithContext(()=>{if(r())return o(c)})}function d(t,e={}){const n=a(e.nuxt);if(n)return i(t,{head:n,...e})}function f(t,e={}){const n=a(e.nuxt);if(n)return s(t,{head:n,...e})}export{f as a,d as u};
