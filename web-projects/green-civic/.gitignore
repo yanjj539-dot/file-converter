@@ -1,0 +1,15 @@
+node_modules
+.nuxt
+.output
+.data
+.nitro
+.cache
+dist
+coverage
+*.log
+dev-server.*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
