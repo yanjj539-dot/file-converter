@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Menu, X, ArrowUpRight } from 'lucide-vue-next'
+import { Menu, X, ArrowUpRight, Search } from 'lucide-vue-next'
 import { navItems } from '~/data/site'
 
 const route = useRoute()
@@ -17,14 +17,23 @@ watch(
 <template>
   <header class="fixed left-0 right-0 top-0 z-40 px-4 pt-4 md:px-8">
     <div class="mx-auto flex max-w-[1520px] items-center justify-between gap-3">
-      <NuxtLink
-        to="/"
-        class="pill focus-ring flex h-12 items-center gap-3 px-4 text-sm font-medium"
-        aria-label="Green Civic 首页"
-      >
-        <span class="grid size-7 place-items-center rounded-full bg-ink text-xs text-paper">GC</span>
-        <span class="hidden sm:inline">Green Civic</span>
-      </NuxtLink>
+      <div class="flex items-center gap-2">
+        <NuxtLink
+          to="/"
+          class="pill focus-ring magnetic-button flex h-12 items-center gap-3 px-4 text-sm font-medium"
+          aria-label="Green Civic 首页"
+        >
+          <span class="grid size-7 place-items-center rounded-full bg-ink text-xs text-paper">GC</span>
+          <span class="hidden sm:inline">Green Civic</span>
+        </NuxtLink>
+        <NuxtLink
+          to="/actions"
+          class="pill focus-ring magnetic-button hidden size-12 place-items-center md:grid"
+          aria-label="搜索行动目录"
+        >
+          <Search :size="18" stroke-width="1.7" aria-hidden="true" />
+        </NuxtLink>
+      </div>
 
       <nav class="pill hidden h-12 items-center gap-1 px-2 md:flex" aria-label="主导航">
         <NuxtLink
@@ -40,7 +49,7 @@ watch(
 
       <div class="flex items-center gap-2">
         <button
-          class="pill focus-ring hidden h-12 items-center gap-2 px-4 text-sm font-medium md:flex"
+          class="pill focus-ring magnetic-button hidden h-12 items-center gap-2 px-4 text-sm font-medium md:flex"
           type="button"
           @click="openDrawer"
         >

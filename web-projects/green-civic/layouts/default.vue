@@ -5,6 +5,7 @@
       <slot />
     </main>
     <AppFooter />
+    <CarbonDock />
     <ActionDrawer />
   </div>
 </template>
