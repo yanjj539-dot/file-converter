@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { ArrowDown, ArrowUpRight, Plus } from 'lucide-vue-next'
-import { actions, collections, journalPosts, sustainabilityPrinciples } from '~/data/site'
+import {
+  actions,
+  civicToolkits,
+  collections,
+  ecoMaterials,
+  journalPosts,
+  materialPassportFields,
+  sustainabilityPrinciples
+} from '~/data/site'
 
 useSeoMeta({
   title: 'Green Civic / 城市绿色公益行动平台',
@@ -15,6 +23,18 @@ const featuredActions = actions.slice(0, 3)
 const latestPosts = journalPosts.slice(0, 3)
 const { addAction, openDrawer } = useActionDrawer()
 const assetPath = useAssetPath()
+const activeMaterialCategory = ref('全部材料')
+
+const materialCategories = computed(() => [
+  '全部材料',
+  ...Array.from(new Set(ecoMaterials.map((material) => material.category)))
+])
+
+const filteredMaterials = computed(() =>
+  activeMaterialCategory.value === '全部材料'
+    ? ecoMaterials
+    : ecoMaterials.filter((material) => material.category === activeMaterialCategory.value)
+)
 
 useHead({
   link: [
@@ -61,13 +81,6 @@ const systemSteps = [
     title: '复盘并复制',
     text: '保留材料、预算、减排估算和居民反馈，为下一条街区、下一所校园提供可迁移样板。'
   }
-]
-
-const materialAtlas = [
-  { name: '再生铝型材', use: '遮阴构架 / 骑行修理台', value: '78% 可回收' },
-  { name: '回收塑木板', use: '社区座椅 / 旧物交换架', value: '12 年维护周期' },
-  { name: '织物再制毡', use: '噪声缓冲 / 市集摊位', value: '420kg 年回流' },
-  { name: '雨水模块箱', use: '植物槽补灌 / 降温节点', value: '35t 年节水' }
 ]
 
 useGsapReveals(page)
@@ -178,6 +191,7 @@ onMounted(async () => {
       repeat: -1,
       ease: 'none'
     })
+
   }, page.value ?? document.body)
 
   if (!story.value) {
@@ -428,27 +442,127 @@ const addCatalogueAction = (action: typeof actions[number]) => {
     </section>
 
     <section class="section-y border-b border-ink/15">
-      <div class="site-container grid gap-10 lg:grid-cols-12">
-        <div class="lg:col-span-5">
-          <SectionLabel label="Material atlas" index="05" />
-          <h2 data-reveal class="mt-8 text-5xl font-medium leading-none md:text-7xl">循环材料要被看见、被编号、被继续使用。</h2>
+      <div class="site-container">
+        <div class="grid gap-10 lg:grid-cols-12">
+          <div class="lg:col-span-5">
+            <SectionLabel label="Material library" index="05" />
+            <h2 data-reveal class="mt-8 text-5xl font-medium leading-none md:text-7xl">环保材料要像产品一样被比较、被维护、被追踪。</h2>
+          </div>
+          <div class="lg:col-span-6 lg:col-start-7">
+            <p data-reveal class="text-xl leading-8 text-muted">
+              Green Civic 把城市环保材料整理成可阅读的材料护照：来源、再生含量、适用场景、维护周期和下一站去向都必须公开。
+            </p>
+            <div data-reveal class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <span v-for="field in materialPassportFields" :key="field" class="passport-field">{{ field }}</span>
+            </div>
+          </div>
         </div>
-        <div class="grid gap-4 lg:col-span-7">
-          <div class="media-frame aspect-[16/9]" data-reveal>
-            <OptimizedImage
-              src="/images/engineering-linework.png"
-              alt="循环材料和公共装置工程线稿"
-              image-class="h-full w-full object-cover"
-              sizes="(max-width: 1023px) 100vw, 58vw"
-            />
+
+        <div class="mt-14 grid gap-8 lg:grid-cols-12">
+          <div class="lg:col-span-4">
+            <div class="media-frame aspect-[4/5]" data-reveal>
+              <OptimizedImage
+                src="/images/engineering-linework.png"
+                alt="环保材料护照工程线稿"
+                image-class="h-full w-full object-cover"
+                sizes="(max-width: 1023px) 100vw, 32vw"
+              />
+            </div>
           </div>
-          <div class="grid gap-3 md:grid-cols-2">
-            <article v-for="material in materialAtlas" :key="material.name" data-reveal class="material-cell">
-              <p class="text-xs text-muted">{{ material.value }}</p>
-              <h3 class="mt-3 text-2xl font-medium">{{ material.name }}</h3>
-              <p class="mt-4 text-sm leading-6 text-muted">{{ material.use }}</p>
-            </article>
+
+          <div class="lg:col-span-8">
+            <div class="thin-scrollbar flex gap-2 overflow-x-auto border-b border-ink/15 pb-5" data-reveal>
+              <button
+                v-for="category in materialCategories"
+                :key="category"
+                type="button"
+                class="focus-ring h-10 shrink-0 rounded-full border px-4 text-sm transition"
+                :class="activeMaterialCategory === category ? 'border-ink bg-ink text-paper' : 'border-ink/15 text-muted hover:border-ink/30 hover:text-ink'"
+                @click="activeMaterialCategory = category"
+              >
+                {{ category }}
+              </button>
+            </div>
+
+            <div class="material-library-grid mt-6">
+              <article
+                v-for="material in filteredMaterials"
+                :key="material.code"
+                class="material-passport"
+                :style="{ '--material-accent': material.color }"
+                data-reveal
+              >
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class="font-mono text-xs text-muted">{{ material.code }} / {{ material.category }}</p>
+                    <h3 class="mt-3 text-3xl font-medium leading-none">{{ material.name }}</h3>
+                  </div>
+                  <span class="material-swatch" aria-hidden="true" />
+                </div>
+                <p class="mt-5 text-sm leading-6 text-muted">{{ material.summary }}</p>
+
+                <div class="mt-6 grid gap-3 border-t border-ink/15 pt-5 md:grid-cols-3">
+                  <div>
+                    <p class="text-[11px] uppercase text-muted">来源</p>
+                    <p class="mt-2 text-sm leading-5">{{ material.source }}</p>
+                  </div>
+                  <div>
+                    <p class="text-[11px] uppercase text-muted">碳与周期</p>
+                    <p class="mt-2 text-sm leading-5">{{ material.carbon }}</p>
+                  </div>
+                  <div>
+                    <p class="text-[11px] uppercase text-muted">维护</p>
+                    <p class="mt-2 text-sm leading-5">{{ material.maintenance }}</p>
+                  </div>
+                </div>
+
+                <div class="mt-5 flex flex-wrap gap-2">
+                  <span v-for="application in material.applications" :key="application" class="material-chip">{{ application }}</span>
+                </div>
+
+                <div class="mt-6 grid gap-3 sm:grid-cols-2">
+                  <div v-for="metric in material.metrics" :key="metric.label" class="passport-meter-row">
+                    <div class="flex items-center justify-between gap-3 text-xs">
+                      <span class="text-muted">{{ metric.label }}</span>
+                      <span>{{ metric.value }}</span>
+                    </div>
+                    <span class="passport-meter" aria-hidden="true">
+                      <span data-passport-meter />
+                    </span>
+                  </div>
+                </div>
+              </article>
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-y border-b border-ink/15 bg-[#ede7da]">
+      <div class="site-container">
+        <div class="grid gap-10 lg:grid-cols-12">
+          <div class="lg:col-span-4">
+            <SectionLabel label="Civic toolkits" index="06" />
+          </div>
+          <div class="lg:col-span-8">
+            <h2 data-reveal class="max-w-5xl text-5xl font-medium leading-none md:text-7xl">
+              真正能持续的公益，需要工具、账本和可复用模块。
+            </h2>
+          </div>
+        </div>
+
+        <div class="mt-16 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article v-for="toolkit in civicToolkits" :key="toolkit.title" class="toolkit-card" data-toolkit-card data-reveal>
+            <div class="flex items-start justify-between gap-4">
+              <span class="toolkit-index">{{ toolkit.index }}</span>
+              <span class="toolkit-metric">{{ toolkit.metric }}</span>
+            </div>
+            <h3 class="mt-14 text-3xl font-medium leading-none">{{ toolkit.title }}</h3>
+            <p class="mt-5 text-sm leading-6 text-muted">{{ toolkit.summary }}</p>
+            <div class="mt-8 grid gap-2">
+              <span v-for="module in toolkit.modules" :key="module" class="toolkit-module">{{ module }}</span>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -456,7 +570,7 @@ const addCatalogueAction = (action: typeof actions[number]) => {
     <section class="section-y border-b border-ink/15">
       <div class="site-container grid gap-10 lg:grid-cols-12">
         <div class="lg:col-span-5">
-          <SectionLabel label="Sustainability system" index="06" />
+          <SectionLabel label="Sustainability system" index="07" />
           <h2 data-reveal class="mt-8 text-5xl font-medium leading-none md:text-7xl">可持续不是章节，是每个行动的结构。</h2>
         </div>
         <div class="grid gap-4 lg:col-span-6 lg:col-start-7">
@@ -477,7 +591,7 @@ const addCatalogueAction = (action: typeof actions[number]) => {
       <div class="site-container">
         <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <SectionLabel label="Journal" index="07" />
+            <SectionLabel label="Journal" index="08" />
             <h2 data-reveal class="mt-8 text-5xl font-medium leading-none md:text-7xl">案例与田野记录</h2>
           </div>
           <NuxtLink to="/journal" class="focus-ring magnetic-button flex h-12 w-fit items-center gap-2 rounded-full border border-ink/15 px-5 text-sm">

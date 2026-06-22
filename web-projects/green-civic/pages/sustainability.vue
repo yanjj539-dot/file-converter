@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowUpRight } from 'lucide-vue-next'
-import { sustainabilityPrinciples } from '~/data/site'
+import { ecoMaterials, materialPassportFields, sustainabilityPrinciples } from '~/data/site'
 
 useSeoMeta({
   title: '可持续专题 / Green Civic',
@@ -8,6 +8,7 @@ useSeoMeta({
 })
 
 const page = ref<HTMLElement | null>(null)
+const featuredMaterials = ecoMaterials.slice(0, 6)
 useGsapReveals(page)
 </script>
 
@@ -60,7 +61,37 @@ useGsapReveals(page)
     <section class="border-y border-ink/15 bg-[#ede7da]">
       <div class="site-container grid gap-12 py-20 lg:grid-cols-12">
         <div class="lg:col-span-4">
-          <SectionLabel label="Operating principles" index="02" />
+          <SectionLabel label="Material passports" index="02" />
+          <h2 class="mt-8 text-5xl font-medium leading-none md:text-7xl">每个环保材料都要写清楚来处和去处。</h2>
+        </div>
+        <div class="lg:col-span-8">
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <span v-for="field in materialPassportFields" :key="field" data-reveal class="passport-field bg-paper/60">{{ field }}</span>
+          </div>
+
+          <div class="mt-12 grid gap-4 md:grid-cols-2">
+            <article
+              v-for="material in featuredMaterials"
+              :key="material.code"
+              data-reveal
+              class="material-cell"
+            >
+              <p class="text-xs text-muted">{{ material.code }} / {{ material.category }}</p>
+              <h3 class="mt-3 text-2xl font-medium">{{ material.name }}</h3>
+              <p class="mt-4 text-sm leading-6 text-muted">{{ material.summary }}</p>
+              <div class="mt-5 flex flex-wrap gap-2">
+                <span v-for="application in material.applications.slice(0, 2)" :key="application" class="material-chip">{{ application }}</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-b border-ink/15">
+      <div class="site-container grid gap-12 py-20 lg:grid-cols-12">
+        <div class="lg:col-span-4">
+          <SectionLabel label="Operating principles" index="03" />
         </div>
         <div class="lg:col-span-8">
           <div
@@ -79,7 +110,7 @@ useGsapReveals(page)
     <section class="site-container section-y">
       <div class="grid gap-10 lg:grid-cols-12">
         <div class="lg:col-span-5">
-          <SectionLabel label="Material policy" index="03" />
+          <SectionLabel label="Material policy" index="04" />
           <h2 class="mt-8 text-5xl font-medium leading-none md:text-7xl">每个构件都要知道下一站在哪里。</h2>
         </div>
         <div class="grid gap-5 lg:col-span-6 lg:col-start-7">
