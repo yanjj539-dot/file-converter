@@ -12,6 +12,7 @@ const story = ref<HTMLElement | null>(null)
 const featuredActions = actions.slice(0, 3)
 const latestPosts = journalPosts.slice(0, 3)
 const { addAction, openDrawer } = useActionDrawer()
+const assetPath = useAssetPath()
 
 useGsapReveals(page)
 
@@ -103,7 +104,7 @@ const addFeatured = () => {
 
         <div class="lg:col-span-5 lg:pt-14" data-reveal>
           <div class="media-frame aspect-[4/5]">
-            <img src="/images/hero-civic-installation.png" alt="抽象城市环保公共装置" class="h-full w-full object-cover" />
+            <img :src="assetPath('/images/hero-civic-installation.png')" alt="抽象城市环保公共装置" class="h-full w-full object-cover" />
           </div>
           <div class="mt-4 grid grid-cols-3 gap-3 text-xs text-muted">
             <div class="border-t border-ink/15 pt-3">
@@ -222,7 +223,7 @@ const addFeatured = () => {
             class="group border-t border-ink/15 pt-5"
           >
             <div class="media-frame aspect-[4/3]">
-              <img :src="post.image" :alt="post.title" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]" loading="lazy" />
+              <img :src="assetPath(post.image)" :alt="post.title" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]" loading="lazy" />
             </div>
             <p class="mt-5 text-xs text-muted">{{ post.category }} / {{ post.date }}</p>
             <h3 class="mt-2 text-2xl font-medium">{{ post.title }}</h3>

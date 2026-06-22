@@ -19,6 +19,7 @@ useSeoMeta({
 
 const page = ref<HTMLElement | null>(null)
 const activeImage = ref<string | null>(null)
+const assetPath = useAssetPath()
 const gallery = [post.image, '/images/action-system-render.png', '/images/community-action-editorial.png'].filter(
   (image, index, all) => all.indexOf(image) === index
 )
@@ -43,7 +44,7 @@ useGsapReveals(page)
       </header>
 
       <div class="mt-14 media-frame aspect-[16/9]" data-reveal>
-        <img :src="post.image" :alt="post.title" class="h-full w-full object-cover" />
+        <img :src="assetPath(post.image)" :alt="post.title" class="h-full w-full object-cover" />
       </div>
 
       <div class="grid gap-12 py-20 lg:grid-cols-12">
@@ -72,7 +73,7 @@ useGsapReveals(page)
             type="button"
             @click="activeImage = image"
           >
-            <img :src="image" :alt="post.title" class="h-full w-full object-cover" loading="lazy" />
+            <img :src="assetPath(image)" :alt="post.title" class="h-full w-full object-cover" loading="lazy" />
           </button>
         </div>
       </section>
@@ -91,7 +92,7 @@ useGsapReveals(page)
           <button class="focus-ring absolute right-5 top-5 grid size-11 place-items-center rounded-full border border-paper/30 text-paper" type="button" aria-label="关闭图像">
             <X :size="18" stroke-width="1.7" aria-hidden="true" />
           </button>
-          <img :src="activeImage" :alt="post.title" class="max-h-[86vh] max-w-[92vw] rounded object-contain" />
+          <img :src="assetPath(activeImage)" :alt="post.title" class="max-h-[86vh] max-w-[92vw] rounded object-contain" />
         </div>
       </Transition>
     </Teleport>

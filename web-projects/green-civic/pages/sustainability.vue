@@ -8,6 +8,7 @@ useSeoMeta({
 })
 
 const page = ref<HTMLElement | null>(null)
+const assetPath = useAssetPath()
 useGsapReveals(page)
 </script>
 
@@ -31,7 +32,7 @@ useGsapReveals(page)
       <div class="grid gap-10 lg:grid-cols-12">
         <div class="lg:col-span-7" data-reveal>
           <div class="media-frame aspect-[16/10] bg-[#ede7da]">
-            <img src="/images/engineering-linework.png" alt="环保公共装置工程线稿" class="h-full w-full object-cover" />
+            <img :src="assetPath('/images/engineering-linework.png')" alt="环保公共装置工程线稿" class="h-full w-full object-cover" />
           </div>
         </div>
         <div class="grid gap-4 lg:col-span-4 lg:col-start-9">
