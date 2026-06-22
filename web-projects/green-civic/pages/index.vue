@@ -16,19 +16,28 @@ const latestPosts = journalPosts.slice(0, 3)
 const { addAction, openDrawer } = useActionDrawer()
 const assetPath = useAssetPath()
 
+useHead({
+  link: [
+    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/hero-civic-installation-320.webp'), type: 'image/webp', fetchpriority: 'high' },
+    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/action-system-render-320.webp'), type: 'image/webp', fetchpriority: 'high' },
+    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/community-action-editorial-320.webp'), type: 'image/webp', fetchpriority: 'high' },
+    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/engineering-linework-320.webp'), type: 'image/webp', fetchpriority: 'high' }
+  ]
+})
+
 const heroFragments = [
   { title: '降温廊道', eyebrow: 'cooling corridor', image: '/images/hero-civic-installation.png', x: 22, y: 23, w: 112, tone: 'moss', depth: 0.18, rotate: -4, fade: 0.95 },
   { title: '循环站', eyebrow: 'material return', image: '/images/action-system-render.png', x: 58, y: 15, w: 82, tone: 'clay', depth: 0.28, rotate: 3, fade: 0.8 },
   { title: '骑行环线', eyebrow: 'bike loop', image: '/images/community-action-editorial.png', x: 73, y: 31, w: 126, tone: 'civic', depth: 0.2, rotate: 5, fade: 0.92 },
-  { title: '分类实验台', eyebrow: 'sorting lab', image: '/images/engineering-linework.png', x: 43, y: 30, w: 74, tone: 'paper', depth: 0.34, rotate: -2, fade: 0.52 },
-  { title: '旧物交换架', eyebrow: 'reuse shelf', image: '/images/action-system-render.png', x: 30, y: 56, w: 78, tone: 'clay', depth: 0.26, rotate: 4, fade: 0.62 },
-  { title: '校园修理岛', eyebrow: 'repair island', image: '/images/community-action-editorial.png', x: 68, y: 63, w: 92, tone: 'civic', depth: 0.3, rotate: -5, fade: 0.72 },
-  { title: '材料样本墙', eyebrow: 'material atlas', image: '/images/engineering-linework.png', x: 48, y: 77, w: 88, tone: 'paper', depth: 0.16, rotate: 2, fade: 0.58 },
+  { title: '分类实验台', eyebrow: 'sorting lab', image: '/images/engineering-linework.png', x: 43, y: 30, w: 74, tone: 'paper', depth: 0.34, rotate: -2, fade: 0.78 },
+  { title: '旧物交换架', eyebrow: 'reuse shelf', image: '/images/action-system-render.png', x: 30, y: 56, w: 78, tone: 'clay', depth: 0.26, rotate: 4, fade: 0.8 },
+  { title: '校园修理岛', eyebrow: 'repair island', image: '/images/community-action-editorial.png', x: 68, y: 63, w: 92, tone: 'civic', depth: 0.3, rotate: -5, fade: 0.84 },
+  { title: '材料样本墙', eyebrow: 'material atlas', image: '/images/engineering-linework.png', x: 48, y: 77, w: 88, tone: 'paper', depth: 0.16, rotate: 2, fade: 0.78 },
   { title: '雨水补灌', eyebrow: 'water reuse', image: '/images/hero-civic-installation.png', x: 60, y: 86, w: 132, tone: 'moss', depth: 0.22, rotate: 0, fade: 0.86 },
   { title: '低碳账本', eyebrow: 'carbon ledger', image: '/images/engineering-linework.png', x: 81, y: 78, w: 170, tone: 'paper', depth: 0.1, rotate: -2, fade: 0.88 },
   { title: '街区补给', eyebrow: 'civic supply', image: '/images/action-system-render.png', x: 16, y: 74, w: 92, tone: 'clay', depth: 0.24, rotate: -4, fade: 0.9 },
-  { title: '温度观测', eyebrow: 'field sensor', image: '/images/hero-civic-installation.png', x: 78, y: 8, w: 58, tone: 'moss', depth: 0.38, rotate: 6, fade: 0.75 },
-  { title: '公益排班', eyebrow: 'stewardship', image: '/images/community-action-editorial.png', x: 38, y: 10, w: 66, tone: 'civic', depth: 0.32, rotate: -6, fade: 0.7 }
+  { title: '温度观测', eyebrow: 'field sensor', image: '/images/hero-civic-installation.png', x: 78, y: 8, w: 58, tone: 'moss', depth: 0.38, rotate: 6, fade: 0.84 },
+  { title: '公益排班', eyebrow: 'stewardship', image: '/images/community-action-editorial.png', x: 38, y: 10, w: 66, tone: 'civic', depth: 0.32, rotate: -6, fade: 0.82 }
 ]
 
 const systemSteps = [
@@ -257,7 +266,14 @@ const addCatalogueAction = (action: typeof actions[number]) => {
           :data-depth="fragment.depth"
           data-float-tile
         >
-          <img :src="assetPath(fragment.image)" :alt="fragment.title" class="float-tile-image" />
+          <OptimizedImage
+            :src="fragment.image"
+            :alt="fragment.title"
+            class="float-tile-image"
+            image-class="object-cover"
+            :sizes="`${Math.max(180, fragment.w * 2)}px`"
+            priority
+          />
           <span class="float-tile-caption">{{ fragment.eyebrow }}</span>
         </div>
 
@@ -325,7 +341,12 @@ const addCatalogueAction = (action: typeof actions[number]) => {
             >
               <NuxtLink :to="`/actions/${action.slug}`" class="block">
                 <div class="media-frame aspect-[4/5]">
-                  <img :src="assetPath(action.image)" :alt="action.title" class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]" loading="lazy" />
+                  <OptimizedImage
+                    :src="action.image"
+                    :alt="action.title"
+                    image-class="h-full w-full object-cover"
+                    sizes="(max-width: 899px) 78vw, 390px"
+                  />
                 </div>
               </NuxtLink>
               <div class="mt-5 flex items-start justify-between gap-4 border-t border-ink/15 pt-4">
@@ -414,7 +435,12 @@ const addCatalogueAction = (action: typeof actions[number]) => {
         </div>
         <div class="grid gap-4 lg:col-span-7">
           <div class="media-frame aspect-[16/9]" data-reveal>
-            <img :src="assetPath('/images/engineering-linework.png')" alt="循环材料和公共装置工程线稿" class="h-full w-full object-cover" loading="lazy" />
+            <OptimizedImage
+              src="/images/engineering-linework.png"
+              alt="循环材料和公共装置工程线稿"
+              image-class="h-full w-full object-cover"
+              sizes="(max-width: 1023px) 100vw, 58vw"
+            />
           </div>
           <div class="grid gap-3 md:grid-cols-2">
             <article v-for="material in materialAtlas" :key="material.name" data-reveal class="material-cell">
@@ -469,7 +495,12 @@ const addCatalogueAction = (action: typeof actions[number]) => {
             class="group border-t border-ink/15 pt-5"
           >
             <div class="media-frame aspect-[4/3]">
-              <img :src="assetPath(post.image)" :alt="post.title" class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]" loading="lazy" />
+              <OptimizedImage
+                :src="post.image"
+                :alt="post.title"
+                image-class="h-full w-full object-cover"
+                sizes="(max-width: 767px) 100vw, 33vw"
+              />
             </div>
             <p class="mt-5 text-xs text-muted">{{ post.category }} / {{ post.date }}</p>
             <h3 class="mt-2 text-2xl font-medium">{{ post.title }}</h3>

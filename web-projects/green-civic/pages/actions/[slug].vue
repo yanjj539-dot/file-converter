@@ -20,7 +20,6 @@ useSeoMeta({
 const page = ref<HTMLElement | null>(null)
 const activeSpec = ref(0)
 const { addAction } = useActionDrawer()
-const assetPath = useAssetPath()
 const relatedActions = actions.filter((item) => item.collection === action.collection && item.slug !== action.slug).slice(0, 2)
 
 useGsapReveals(page)
@@ -54,7 +53,13 @@ const add = () => {
         </div>
         <div class="lg:col-span-5" data-reveal>
           <div class="media-frame aspect-[4/5]">
-            <img :src="assetPath(action.image)" :alt="action.title" class="h-full w-full object-cover" />
+            <OptimizedImage
+              :src="action.image"
+              :alt="action.title"
+              image-class="h-full w-full object-cover"
+              sizes="(max-width: 1023px) 100vw, 42vw"
+              priority
+            />
           </div>
         </div>
       </div>

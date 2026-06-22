@@ -9,7 +9,6 @@ useSeoMeta({
 
 const page = ref<HTMLElement | null>(null)
 const activeCategory = ref('全部')
-const assetPath = useAssetPath()
 
 useGsapReveals(page)
 
@@ -40,7 +39,13 @@ const heroPost = journalPosts[0]
       <NuxtLink :to="`/journal/${heroPost.slug}`" class="group grid gap-8 border-y border-ink/15 py-8 lg:grid-cols-12">
         <div class="lg:col-span-7">
           <div class="media-frame aspect-[16/9]">
-            <img :src="assetPath(heroPost.image)" :alt="heroPost.title" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.025]" />
+            <OptimizedImage
+              :src="heroPost.image"
+              :alt="heroPost.title"
+              image-class="h-full w-full object-cover"
+              sizes="(max-width: 1023px) 100vw, 58vw"
+              priority
+            />
           </div>
         </div>
         <div class="flex flex-col justify-between lg:col-span-4 lg:col-start-9">
@@ -80,7 +85,12 @@ const heroPost = journalPosts[0]
           class="group border-t border-ink/15 pt-5"
         >
           <div class="media-frame aspect-[4/3]">
-            <img :src="assetPath(post.image)" :alt="post.title" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]" loading="lazy" />
+            <OptimizedImage
+              :src="post.image"
+              :alt="post.title"
+              image-class="h-full w-full object-cover"
+              sizes="(max-width: 767px) 100vw, 33vw"
+            />
           </div>
           <p class="mt-5 text-xs text-muted">{{ post.category }} / {{ post.date }}</p>
           <h2 class="mt-2 text-3xl font-medium">{{ post.title }}</h2>

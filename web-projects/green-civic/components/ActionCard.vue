@@ -8,7 +8,6 @@ const props = defineProps<{
 }>()
 
 const { addAction } = useActionDrawer()
-const assetPath = useAssetPath()
 
 const add = () => {
   addAction({
@@ -23,11 +22,11 @@ const add = () => {
   <article class="group grid min-h-[460px] border-t border-ink/15 pt-5 md:min-h-[520px]">
     <NuxtLink :to="`/actions/${action.slug}`" class="block">
       <div class="media-frame aspect-[4/3]">
-        <img
-          :src="assetPath(action.image)"
+        <OptimizedImage
+          :src="action.image"
           :alt="action.title"
-          class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]"
-          loading="lazy"
+          image-class="h-full w-full object-cover"
+          sizes="(max-width: 767px) 100vw, 33vw"
         />
       </div>
     </NuxtLink>

@@ -8,7 +8,6 @@ useSeoMeta({
 
 const page = ref<HTMLElement | null>(null)
 const timeline = ref<HTMLElement | null>(null)
-const assetPath = useAssetPath()
 
 useGsapReveals(page)
 
@@ -61,7 +60,13 @@ const endDrag = () => {
       <div class="grid gap-10 lg:grid-cols-12">
         <div class="lg:col-span-5" data-reveal>
           <div class="media-frame aspect-[4/5]">
-            <img :src="assetPath('/images/community-action-editorial.png')" alt="社区低碳行动现场" class="h-full w-full object-cover" />
+            <OptimizedImage
+              src="/images/community-action-editorial.png"
+              alt="社区低碳行动现场"
+              image-class="h-full w-full object-cover"
+              sizes="(max-width: 1023px) 100vw, 42vw"
+              priority
+            />
           </div>
         </div>
         <div class="lg:col-span-6 lg:col-start-7">
