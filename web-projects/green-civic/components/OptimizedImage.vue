@@ -25,6 +25,7 @@ const attrs = useAttrs()
 const assetPath = useAssetPath()
 const loaded = ref(false)
 const failed = ref(false)
+const useOptimized = ref(true)
 const image = ref<HTMLImageElement | null>(null)
 
 const localImage = computed(() => /^\/images\/[^?#]+\.(png|jpe?g)$/i.test(props.src))
@@ -34,7 +35,7 @@ const stem = computed(() => {
 })
 
 const optimizedSrcset = computed(() => {
-  if (!localImage.value) return ''
+  if (!localImage.value || !useOptimized.value) return ''
   return [320, 640, 960, 1440]
     .map((width) => `${assetPath(`/images/optimized/${stem.value}-${width}.webp`)} ${width}w`)
     .join(', ')
@@ -47,8 +48,23 @@ const onLoad = () => {
 }
 
 const onError = () => {
+  if (localImage.value && useOptimized.value) {
+    useOptimized.value = false
+    loaded.value = false
+    failed.value = false
+    return
+  }
   failed.value = true
 }
+
+watch(
+  () => props.src,
+  () => {
+    loaded.value = false
+    failed.value = false
+    useOptimized.value = true
+  }
+)
 
 onMounted(() => {
   if (image.value?.complete && image.value.naturalWidth > 0) {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowUpRight } from 'lucide-vue-next'
-import { ecoMaterials, materialPassportFields, sustainabilityPrinciples } from '~/data/site'
+import { civicLedgers, ecoMaterials, materialPassportFields, materialRoutes, sustainabilityPrinciples } from '~/data/site'
 
 useSeoMeta({
   title: '可持续专题 / Green Civic',
@@ -8,7 +8,7 @@ useSeoMeta({
 })
 
 const page = ref<HTMLElement | null>(null)
-const featuredMaterials = ecoMaterials.slice(0, 6)
+const featuredMaterials = ecoMaterials.slice(0, 8)
 useGsapReveals(page)
 </script>
 
@@ -91,7 +91,37 @@ useGsapReveals(page)
     <section class="border-b border-ink/15">
       <div class="site-container grid gap-12 py-20 lg:grid-cols-12">
         <div class="lg:col-span-4">
-          <SectionLabel label="Operating principles" index="03" />
+          <SectionLabel label="Material routes" index="03" />
+          <h2 class="mt-8 text-5xl font-medium leading-none md:text-7xl">从废弃物到公共构件。</h2>
+        </div>
+        <div class="grid gap-4 lg:col-span-8 lg:grid-cols-2">
+          <article
+            v-for="route in materialRoutes"
+            :key="route.from"
+            data-reveal
+            class="material-route min-h-[360px]"
+          >
+            <p class="font-mono text-xs text-muted">ROUTE / {{ route.from }}</p>
+            <div class="mt-12 grid gap-5">
+              <div>
+                <span>PROCESS</span>
+                <strong>{{ route.method }}</strong>
+              </div>
+              <div>
+                <span>PUBLIC USE</span>
+                <strong>{{ route.to }}</strong>
+              </div>
+            </div>
+            <p class="mt-10 border-t border-ink/15 pt-5 text-sm leading-6 text-muted">{{ route.output }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-b border-ink/15">
+      <div class="site-container grid gap-12 py-20 lg:grid-cols-12">
+        <div class="lg:col-span-4">
+          <SectionLabel label="Operating principles" index="04" />
         </div>
         <div class="lg:col-span-8">
           <div
@@ -110,7 +140,36 @@ useGsapReveals(page)
     <section class="site-container section-y">
       <div class="grid gap-10 lg:grid-cols-12">
         <div class="lg:col-span-5">
-          <SectionLabel label="Material policy" index="04" />
+          <SectionLabel label="Public maintenance" index="05" />
+          <h2 class="mt-8 text-5xl font-medium leading-none md:text-7xl">可持续要被持续记录。</h2>
+        </div>
+        <div class="lg:col-span-6 lg:col-start-7">
+          <div class="border-t border-ink/15">
+            <article
+              v-for="entry in civicLedgers"
+              :key="`${entry.area}-${entry.action}`"
+              data-reveal
+              class="ledger-row"
+            >
+              <div>
+                <p class="text-sm text-muted">{{ entry.area }}</p>
+                <h3 class="mt-2 text-2xl font-medium">{{ entry.action }}</h3>
+              </div>
+              <p class="text-sm leading-6 text-muted">{{ entry.material }}</p>
+              <div class="ledger-status">
+                <span>{{ entry.status }}</span>
+                <strong>{{ entry.metric }}</strong>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-container pb-28">
+      <div class="grid gap-10 lg:grid-cols-12">
+        <div class="lg:col-span-5">
+          <SectionLabel label="Material policy" index="06" />
           <h2 class="mt-8 text-5xl font-medium leading-none md:text-7xl">每个构件都要知道下一站在哪里。</h2>
         </div>
         <div class="grid gap-5 lg:col-span-6 lg:col-start-7">

@@ -48,6 +48,28 @@ export type CivicToolkit = {
   modules: string[]
 }
 
+export type HeroSignal = {
+  code: string
+  title: string
+  meta: string
+  value: string
+}
+
+export type CivicLedgerEntry = {
+  area: string
+  action: string
+  material: string
+  status: string
+  metric: string
+}
+
+export type MaterialRoute = {
+  from: string
+  to: string
+  method: string
+  output: string
+}
+
 export const navItems = [
   { label: '行动目录', to: '/actions' },
   { label: '可持续专题', to: '/sustainability' },
@@ -66,8 +88,20 @@ export const collections = [
   '雨洪管理',
   '修复与再利用',
   '生物基材料',
+  '低碳能源',
+  '食物减废',
+  '水体修复',
+  '零废弃活动',
+  '旧建筑再生',
   '公共空间环保改造',
   '校园 / 社区低碳行动'
+]
+
+export const heroSignals: HeroSignal[] = [
+  { code: 'CO2', title: '年度减排样本', meta: '公开估算 / 可复核', value: '186t' },
+  { code: 'MAT', title: '材料回流批次', meta: '护照化追踪', value: '42批' },
+  { code: 'CIV', title: '共管节点', meta: '社区 / 校园 / 商户', value: '128处' },
+  { code: 'FIX', title: '维护任务', meta: '月度账本', value: '916次' }
 ]
 
 export const ecoMaterials: EcoMaterial[] = [
@@ -198,6 +232,134 @@ export const ecoMaterials: EcoMaterial[] = [
       { label: '可降解', value: '可控' },
       { label: '重量降低', value: '45%' }
     ]
+  },
+  {
+    code: 'M-09',
+    name: '竹纤维复合板',
+    category: '生物基材料',
+    source: '速生竹材 / 植物基树脂',
+    summary: '适合低碳课程桌、社区议事台和临时展架，重量轻、触感温和，适合需要频繁移动的公共活动家具。',
+    color: '#d6c99c',
+    carbon: '替代部分高碳板材',
+    cycle: '5-8 年室内外半开放',
+    maintenance: '年度封边检查',
+    applications: ['低碳课堂', '社区议事台', '活动展架'],
+    metrics: [
+      { label: '生物基含量', value: '68%' },
+      { label: '拆装次数', value: '120+' }
+    ]
+  },
+  {
+    code: 'M-10',
+    name: '再生玻璃透光砖',
+    category: '循环材料',
+    source: '废玻璃 / 低温烧结工艺',
+    summary: '用于分类实验室、社区材料墙和半透导视，让回收玻璃从废弃物变成公共空间的光线材料。',
+    color: '#c8ddd8',
+    carbon: '减少原生玻璃熔制',
+    cycle: '12 年以上构件周期',
+    maintenance: '低频清洁',
+    applications: ['材料样本墙', '分类室隔断', '半透导视'],
+    metrics: [
+      { label: '回收玻璃', value: '86%' },
+      { label: '透光率', value: '54%' }
+    ]
+  },
+  {
+    code: 'M-11',
+    name: '稻壳灰低碳混凝土',
+    category: '低碳建材',
+    source: '稻壳灰 / 再生骨料 / 低熟料配方',
+    summary: '用于街角坐凳、雨水花园边界和小型基础构件，降低水泥用量并提升农业副产物利用。',
+    color: '#d9d4c4',
+    carbon: '熟料替代 18-25%',
+    cycle: '10 年以上公共构件',
+    maintenance: '裂缝年度巡检',
+    applications: ['街角坐凳', '雨水花园边界', '低碳基础件'],
+    metrics: [
+      { label: '熟料替代', value: '22%' },
+      { label: '抗压等级', value: 'C30' }
+    ]
+  },
+  {
+    code: 'M-12',
+    name: '再生橡胶缓冲垫',
+    category: '修复与再利用',
+    source: '废旧轮胎 / 运动场边角料',
+    summary: '适合骑行修理岛、校园慢行节点和儿童通学缓冲区，降低摔倒损伤并延长废橡胶寿命。',
+    color: '#42413b',
+    carbon: '减少废轮胎填埋',
+    cycle: '6-8 年户外周期',
+    maintenance: '边缘翘起巡检',
+    applications: ['骑行修理岛', '慢行节点', '通学缓冲区'],
+    metrics: [
+      { label: '废橡胶利用', value: '38kg/㎡' },
+      { label: '冲击吸收', value: '高' }
+    ]
+  },
+  {
+    code: 'M-13',
+    name: 'PET 再生透明板',
+    category: '循环材料',
+    source: '饮料瓶回收 / 透明片材再造',
+    summary: '用于低碳市集挡雨板、材料信息牌和行动箱窗口，保持轻量、可替换和可再回收。',
+    color: '#d7e4df',
+    carbon: '减少原生塑料片材',
+    cycle: '3-5 年可替换面板',
+    maintenance: '划痕与固定件检查',
+    applications: ['信息牌', '行动箱窗口', '市集雨棚'],
+    metrics: [
+      { label: '再生含量', value: '92%' },
+      { label: '单板重量', value: '-34%' }
+    ]
+  },
+  {
+    code: 'M-14',
+    name: '藻基吸附涂层',
+    category: '水体修复',
+    source: '藻类副产物 / 矿物基载体',
+    summary: '用于河岸教育装置和雨水口样本板，展示水体营养盐吸附与低维护表面材料的可能性。',
+    color: '#90a896',
+    carbon: '生物基吸附材料',
+    cycle: '2-4 年示范周期',
+    maintenance: '季度样本替换',
+    applications: ['河岸样本板', '雨水口教育装置', '水质观察站'],
+    metrics: [
+      { label: '吸附周期', value: '90天' },
+      { label: '样本可替换', value: '是' }
+    ]
+  },
+  {
+    code: 'M-15',
+    name: 'HDPE 回收浮筒',
+    category: '水体修复',
+    source: '高密度聚乙烯回收料 / 标准连接件',
+    summary: '用于河道漂浮物拦截、湿地植物浮岛和水岸公益行动，模块化连接便于清理和迁移。',
+    color: '#9fb8bf',
+    carbon: '回收塑料水域再用',
+    cycle: '8 年模块周期',
+    maintenance: '月度连接件检查',
+    applications: ['漂浮物拦截', '生态浮岛', '水岸行动台'],
+    metrics: [
+      { label: '回收料', value: '74%' },
+      { label: '单元浮力', value: '36kg' }
+    ]
+  },
+  {
+    code: 'M-16',
+    name: '柔性光伏遮阴膜',
+    category: '低碳能源',
+    source: '轻量光伏组件 / 可拆卸支架',
+    summary: '适合候车亭、校园休憩廊和街角补给站，在遮阴的同时为传感器、照明和公益屏供电。',
+    color: '#2f3433',
+    carbon: '运营期可再生电力',
+    cycle: '8-10 年组件周期',
+    maintenance: '半年电气安全检查',
+    applications: ['光伏候车亭', '校园休憩廊', '公益信息屏'],
+    metrics: [
+      { label: '峰值功率', value: '420W/组' },
+      { label: '照明自给', value: '70%' }
+    ]
   }
 ]
 
@@ -238,6 +400,92 @@ export const civicToolkits: CivicToolkit[] = [
     summary: '为校园和社区提供可复用的材料课、分类课、骑行课和碳账本共学课。',
     metric: '8 周周期',
     modules: ['材料样本', '任务卡', '教师手册', '居民反馈表']
+  },
+  {
+    index: '05',
+    title: '维护巡检卡',
+    summary: '把滤网、紧固件、涂层、植物、照明和传感器检查拆成志愿者可执行的短任务。',
+    metric: '15 分钟/点',
+    modules: ['巡检路线', '异常拍照', '维修工单', '下次提醒']
+  },
+  {
+    index: '06',
+    title: '零废弃活动包',
+    summary: '为市集、校园周和社区节日提供可复用餐具、称重、补给、分类和减量记录工具。',
+    metric: '1 天快装',
+    modules: ['借还餐具', '包装称重', '商户协议', '减量看板']
+  },
+  {
+    index: '07',
+    title: '街角能源盒',
+    summary: '把小型光伏、储能、夜间照明和公益信息屏整合进可拆卸的低碳公共节点。',
+    metric: '70% 自给',
+    modules: ['柔性光伏', '储能模块', '夜间照明', '电量公开']
+  },
+  {
+    index: '08',
+    title: '食物减废台',
+    summary: '连接社区共享冰箱、临期食物登记、厨余称重和堆肥回用，减少可食用食物浪费。',
+    metric: '48h 周转',
+    modules: ['共享冰箱', '临期登记', '厨余称重', '堆肥回用']
+  }
+]
+
+export const civicLedgers: CivicLedgerEntry[] = [
+  {
+    area: '南桥街区',
+    action: '降温廊道植物槽巡检',
+    material: '生物炭种植基质 / 雨水模块箱',
+    status: '本周完成',
+    metric: '补灌 1.8t'
+  },
+  {
+    area: '东门社区',
+    action: '材料回收站月度公开',
+    material: 'PET 再生透明板 / 回收塑木板',
+    status: '待居民复核',
+    metric: '回流 2.4t'
+  },
+  {
+    area: '河岸样本段',
+    action: '漂浮物拦截与水质观察',
+    material: 'HDPE 回收浮筒 / 藻基吸附涂层',
+    status: '运行中',
+    metric: '清理 318kg'
+  },
+  {
+    area: '槐荫校园',
+    action: '零废弃活动周复盘',
+    material: '竹纤维复合板 / 借还餐具',
+    status: '下周投票',
+    metric: '减量 11k件'
+  }
+]
+
+export const materialRoutes: MaterialRoute[] = [
+  {
+    from: '拆建废铝',
+    to: '骑行修理岛',
+    method: '熔炼成型 / 标准连接件',
+    output: '可拆卸遮阴与导视构件'
+  },
+  {
+    from: '旧衣与校服',
+    to: '共学空间',
+    method: '纤维开松 / 热压成毡',
+    output: '吸音背板与材料教育样本'
+  },
+  {
+    from: '废玻璃',
+    to: '分类实验室',
+    method: '破碎筛分 / 低温烧结',
+    output: '透光砖与半透导视'
+  },
+  {
+    from: '厨余与枝条',
+    to: '校园花园',
+    method: '堆肥 / 生物炭混拌',
+    output: '土壤改良基质'
   }
 ]
 
@@ -466,6 +714,156 @@ export const actions: CivicAction[] = [
     modules: ['厨余称重台', '封闭堆肥箱', '生物炭混拌桶', '校园花园回用区'],
     process: ['设定收集时间', '记录厨余重量', '混拌生物炭', '回用于校园种植'],
     detail: '校园厨余堆肥站把垃圾分类、生物基材料和生态教育放在同一条链路里。学生看到厨余从食堂进入堆肥箱，再回到校园花园，环保不再只是抽象的分类要求。'
+  },
+  {
+    slug: 'solar-shade-stop',
+    title: '光伏遮阴候车亭',
+    subtitle: '把候车、遮阴、夜间照明和低碳能源公开屏合并成绿色出行节点。',
+    collection: '低碳能源',
+    type: '绿色出行',
+    location: '公交站 / 校园接驳点',
+    image: '/images/hero-civic-installation.png',
+    tone: 'moss',
+    summary: '用柔性光伏遮阴膜、低功耗照明和公交信息屏，让通勤等待成为可见的低碳基础设施。',
+    impact: '提升公共交通等候体验，降低夜间照明外接能耗，并用公开电量鼓励绿色出行选择。',
+    metrics: [
+      { label: '照明自给', value: '70%' },
+      { label: '覆盖站点', value: '18处' },
+      { label: '候车降温', value: '3.8°C' }
+    ],
+    specs: [
+      { label: '模块', value: '柔性光伏 / 储能盒 / 夜间灯带 / 公益信息屏' },
+      { label: '周期', value: '20天完成首批站点改造' },
+      { label: '维护', value: '半年电气巡检 + 月度清洁' }
+    ],
+    modules: ['光伏遮阴膜', '低功耗灯带', '电量公开屏', '公交换乘导视'],
+    process: ['筛选暴晒站点', '安装可拆卸支架', '接入低压储能', '公开发电与维护记录'],
+    detail: '光伏遮阴候车亭把绿色出行的等待空间做成小型低碳能源节点。它不追求大型能源工程，而是让居民每天能看到公共交通与可再生电力之间的关系。'
+  },
+  {
+    slug: 'river-plastic-intercept',
+    title: '河岸塑料拦截工作坊',
+    subtitle: '把漂浮物清理、水体观察和再生材料教育放到同一个河岸行动中。',
+    collection: '水体修复',
+    type: '材料系统',
+    location: '城市河岸 / 雨水口周边',
+    image: '/images/engineering-linework.png',
+    tone: 'civic',
+    summary: '用回收 HDPE 浮筒和可替换拦截网收集漂浮物，再把清理数据转化为材料课程和社区看板。',
+    impact: '减少塑料进入下游水体，建立水岸志愿巡检机制，并让居民看见一次性塑料的真实去向。',
+    metrics: [
+      { label: '月清理量', value: '318kg' },
+      { label: '巡检志愿者', value: '54人' },
+      { label: '水质记录', value: '96组' }
+    ],
+    specs: [
+      { label: '模块', value: 'HDPE 浮筒 / 拦截网 / 水质样本盒 / 河岸看板' },
+      { label: '周期', value: '12天完成一段河岸试点' },
+      { label: '维护', value: '每周清理 + 雨后巡检' }
+    ],
+    modules: ['漂浮物拦截单元', '水质观察盒', '材料分类台', '河岸公开看板'],
+    process: ['定位漂浮物聚集点', '布设拦截浮筒', '组织清理称重', '转化为材料教育样本'],
+    detail: '河岸塑料拦截工作坊把水体修复做成公众能参与的现场系统。漂浮物不再只是被清走，而是被称重、分类、展示和复盘，成为水岸环保教育的证据。'
+  },
+  {
+    slug: 'shared-fridge-loop',
+    title: '社区食物减废循环站',
+    subtitle: '用共享冰箱、临期食物登记和厨余堆肥减少城市食物浪费。',
+    collection: '食物减废',
+    type: '生活方式',
+    location: '社区客厅 / 菜市场周边',
+    image: '/images/community-action-editorial.png',
+    tone: 'clay',
+    summary: '把可食用临期食物、商户余量、居民共享和厨余回用整理成一套可运营的食物循环节点。',
+    impact: '降低可食用食物浪费，减少湿垃圾外运，并为邻里互助和公益厨房建立稳定补给。',
+    metrics: [
+      { label: '食物周转', value: '48h' },
+      { label: '月减废', value: '1.1t' },
+      { label: '合作小店', value: '27家' }
+    ],
+    specs: [
+      { label: '模块', value: '共享冰箱 / 临期登记 / 温度记录 / 厨余称重' },
+      { label: '周期', value: '30天建立首个循环站' },
+      { label: '维护', value: '志愿馆员 + 商户共管' }
+    ],
+    modules: ['共享冰箱', '临期食物登记', '温度巡检卡', '厨余堆肥桶'],
+    process: ['签订商户规则', '建立食品安全检查', '开放固定领取时段', '公开减废与去向数据'],
+    detail: '社区食物减废循环站不是简单放置冰箱，而是把食品安全、志愿排班、商户协作和厨余回用写进同一个运营流程。它让低碳生活具有日常服务的可信度。'
+  },
+  {
+    slug: 'zero-waste-campus-week',
+    title: '校园零废弃实验周',
+    subtitle: '用借还餐具、包装称重和学生策展把环保周变成可复盘的低碳实验。',
+    collection: '零废弃活动',
+    type: '公共教育',
+    location: '高校 / 中学校园',
+    image: '/images/action-system-render.png',
+    tone: 'civic',
+    summary: '把一次环保活动拆成餐具借还、摊位协议、包装称重、材料展陈和班级复盘。',
+    impact: '减少一次性包装与活动垃圾，并让学生理解活动运营、材料选择和减量数据之间的关系。',
+    metrics: [
+      { label: '一次性用品减少', value: '11k件' },
+      { label: '参与摊位', value: '43个' },
+      { label: '学生策展', value: '12组' }
+    ],
+    specs: [
+      { label: '模块', value: '借还餐具 / 包装称重 / 摊位协议 / 减量展板' },
+      { label: '周期', value: '7天活动 + 7天复盘' },
+      { label: '维护', value: '学生会 + 后勤 + 社团' }
+    ],
+    modules: ['餐具借还站', '包装称重台', '摊位低碳协议', '学生材料展'],
+    process: ['制定摊位规则', '布置借还动线', '实时称重记录', '发布零废弃复盘'],
+    detail: '校园零废弃实验周避免把环保周做成标语活动。每个摊位、餐具、包装和废弃物都进入记录，学生能看到设计选择如何影响真实减量。'
+  },
+  {
+    slug: 'building-material-bank',
+    title: '旧建筑材料再利用仓',
+    subtitle: '把拆除现场的门窗、砖、木材和金属构件转化为社区改造库存。',
+    collection: '旧建筑再生',
+    type: '材料系统',
+    location: '城市更新片区 / 旧厂房周边',
+    image: '/images/engineering-linework.png',
+    tone: 'paper',
+    summary: '建立拆建材料的登记、评估、存放和再使用流程，让城市更新不只产生建筑垃圾。',
+    impact: '减少拆建废弃物外运，为小型公共空间改造提供低成本、低碳且有历史痕迹的材料。',
+    metrics: [
+      { label: '材料入库', value: '86t' },
+      { label: '再用构件', value: '420件' },
+      { label: '改造点位', value: '16处' }
+    ],
+    specs: [
+      { label: '模块', value: '材料登记 / 安全评估 / 尺寸档案 / 预约领用' },
+      { label: '周期', value: '拆除前 2 周建立临时仓' },
+      { label: '维护', value: '设计师 + 社区 + 施工方共管' }
+    ],
+    modules: ['构件登记台', '材料安全评估', '临时存放架', '领用预约表'],
+    process: ['拆除前材料盘点', '评估可再用构件', '建立尺寸档案', '匹配社区微改造'],
+    detail: '旧建筑材料再利用仓把城市更新中的“废料”重新命名为公共材料库存。门窗、砖和金属构件被记录、清洁、评估，再进入社区花园、展台和街角家具。'
+  },
+  {
+    slug: 'quiet-school-street',
+    title: '安静通学街道',
+    subtitle: '用临时路权、慢行导视和空气噪声记录重做学校门口的低碳通勤。',
+    collection: '绿色出行',
+    type: '空间改造',
+    location: '中小学门口 / 社区支路',
+    image: '/images/community-action-editorial.png',
+    tone: 'moss',
+    summary: '把上放学时段的机动车拥堵转化为步行、骑行和公共交通优先的安全街道实验。',
+    impact: '降低校门口怠速排放和噪声，提升儿童步行安全，并把通学路线纳入社区共治。',
+    metrics: [
+      { label: '怠速下降', value: '44%' },
+      { label: '步行比例', value: '+28%' },
+      { label: '共管家庭', value: '310户' }
+    ],
+    specs: [
+      { label: '模块', value: '可移动护栏 / 通学导视 / 空气噪声记录 / 家长排班' },
+      { label: '周期', value: '4周试运行' },
+      { label: '维护', value: '学校 + 家委会 + 社区协作' }
+    ],
+    modules: ['临时路权标识', '步行集合点', '噪声空气记录', '家长志愿排班'],
+    process: ['测绘通学路线', '设定限行时段', '组织步行队伍', '公开空气噪声变化'],
+    detail: '安静通学街道把绿色出行与儿童友好街区放在一起。它不是永久封路，而是通过可调整的时段、设施和数据，让社区看见低碳通勤的可行边界。'
   }
 ]
 
@@ -572,6 +970,71 @@ export const journalPosts: JournalPost[] = [
       '材料护照不是给专业人士看的长表格，而是帮助社区知道某个构件为什么被选用、如何维护、何时替换、替换后去哪里。',
       '最小可用版本只需要六项：来源批次、再生含量、适用场景、维护周期、拆卸方法和下一站去向。字段越少，越容易被长期执行。',
       '当材料护照进入行动详情页和现场标签，公共空间里的每个构件都能成为一次环保教育。'
+    ]
+  },
+  {
+    slug: 'solar-bus-stop-prototype',
+    title: '光伏候车亭不应该只是发电',
+    category: 'Energy',
+    date: '2025.10',
+    excerpt: '小型光伏装置进入公共空间时，遮阴、照明、维护和公开数据同样重要。',
+    image: '/images/hero-civic-installation.png',
+    body: [
+      '候车亭上的光伏组件如果只被当成发电设备，很容易变成昂贵装饰。我们把它重新定义为遮阴、夜间安全和公益信息服务的复合节点。',
+      '最小版本只保留四项功能：遮阴、低功耗灯带、储能状态和维护记录。居民不需要理解复杂电气系统，也能知道这处设施是否正常运行。',
+      '真正决定项目能否复制的是维护边界。谁清洁组件、谁检查电气安全、谁更新公开屏，都需要写进部署手册。'
+    ]
+  },
+  {
+    slug: 'food-waste-civic-service',
+    title: '食物减废为什么要像社区服务',
+    category: 'Food',
+    date: '2025.09',
+    excerpt: '共享冰箱只有和商户规则、温度记录、志愿排班连接起来，才会长期可信。',
+    image: '/images/community-action-editorial.png',
+    body: [
+      '共享冰箱的难点不是设备，而是信任。居民关心食物是否安全，商户关心责任边界，志愿者关心维护是否可持续。',
+      '我们把食物减废站拆成临期登记、温度巡检、领取时段和厨余去向四个模块，让每个环节都有可执行规则。',
+      '当食物减废被设计成稳定服务，而不是一次捐赠活动，它才有机会长期减少湿垃圾和食物浪费。'
+    ]
+  },
+  {
+    slug: 'river-material-evidence',
+    title: '河岸清理之后，材料证据留在哪里',
+    category: 'Water',
+    date: '2025.08',
+    excerpt: '水体修复行动需要把清理量、材料种类和雨后变化留给公众看见。',
+    image: '/images/engineering-linework.png',
+    body: [
+      '河岸清理活动结束后，最容易消失的是证据。漂浮物被运走，居民只看到短暂干净，却不知道污染从哪里来、会不会再次出现。',
+      '我们把清理物按材料分成塑料瓶、泡沫、包装袋和其他杂物，称重后进入河岸看板。雨后再做一次记录，比较不同天气下的变化。',
+      '这套方法让水体修复从劳动活动变成长期观察，下一次治理可以根据材料证据调整拦截位置。'
+    ]
+  },
+  {
+    slug: 'building-material-bank-story',
+    title: '一扇旧窗如何进入新的社区花园',
+    category: 'Reuse',
+    date: '2025.07',
+    excerpt: '旧建筑材料进入公共空间前，需要登记、评估、清洁和重新匹配。',
+    image: '/images/action-system-render.png',
+    body: [
+      '城市更新现场常常在短时间内产生大量可再用构件。问题是拆除节奏很快，如果没有提前盘点，这些材料会直接进入废弃物流。',
+      '材料再利用仓先记录尺寸、材质、损伤和安全等级，再匹配社区花园、展台或街角家具的需求。不是所有旧材料都适合再用，但每一次再用都需要清晰理由。',
+      '当旧窗、旧砖和旧木料重新出现在社区花园里，公共空间会保留一部分城市记忆，同时减少新材料消耗。'
+    ]
+  },
+  {
+    slug: 'quiet-school-street-note',
+    title: '校门口的低碳不是少开几辆车而已',
+    category: 'Mobility',
+    date: '2025.06',
+    excerpt: '通学街道需要同时处理安全、噪声、空气、家长排班和儿童路线。',
+    image: '/images/community-action-editorial.png',
+    body: [
+      '学校门口的拥堵很少只靠劝导解决。家长担心安全，车辆停靠缺少秩序，儿童步行路线也常被临时占用。',
+      '安静通学街道采用可移动设施和时段规则，先做四周实验，再用噪声、空气和步行比例判断是否扩大。',
+      '低碳通学的重点不是要求每个家庭立刻改变，而是提供更安全、更有秩序的替代路径。'
     ]
   }
 ]

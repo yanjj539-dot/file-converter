@@ -2,10 +2,13 @@
 import { ArrowDown, ArrowUpRight, Plus } from 'lucide-vue-next'
 import {
   actions,
+  civicLedgers,
   civicToolkits,
   collections,
   ecoMaterials,
+  heroSignals,
   journalPosts,
+  materialRoutes,
   materialPassportFields,
   sustainabilityPrinciples
 } from '~/data/site'
@@ -20,6 +23,7 @@ const hero = ref<HTMLElement | null>(null)
 const catalogue = ref<HTMLElement | null>(null)
 const story = ref<HTMLElement | null>(null)
 const featuredActions = actions.slice(0, 3)
+const recentActions = actions.slice(-4).reverse()
 const latestPosts = journalPosts.slice(0, 3)
 const { addAction, openDrawer } = useActionDrawer()
 const assetPath = useAssetPath()
@@ -38,10 +42,10 @@ const filteredMaterials = computed(() =>
 
 useHead({
   link: [
-    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/hero-civic-installation-320.webp'), type: 'image/webp', fetchpriority: 'high' },
-    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/action-system-render-320.webp'), type: 'image/webp', fetchpriority: 'high' },
-    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/community-action-editorial-320.webp'), type: 'image/webp', fetchpriority: 'high' },
-    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/engineering-linework-320.webp'), type: 'image/webp', fetchpriority: 'high' }
+    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/hero-civic-installation-640.webp'), type: 'image/webp', fetchpriority: 'high' },
+    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/action-system-render-640.webp'), type: 'image/webp', fetchpriority: 'high' },
+    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/community-action-editorial-640.webp'), type: 'image/webp', fetchpriority: 'high' },
+    { rel: 'preload', as: 'image', href: assetPath('/images/optimized/engineering-linework-640.webp'), type: 'image/webp', fetchpriority: 'high' }
   ]
 })
 
@@ -101,9 +105,11 @@ onMounted(async () => {
 
   motionCtx = gsap.context(() => {
     const tiles = gsap.utils.toArray<HTMLElement>('[data-float-tile]')
+    const signals = gsap.utils.toArray<HTMLElement>('[data-hero-signal]')
     const titleLines = gsap.utils.toArray<HTMLElement>('[data-hero-line]')
 
     gsap.set(tiles, { transformOrigin: '50% 50%', willChange: 'transform, opacity' })
+    gsap.set(signals, { willChange: 'transform, opacity' })
     gsap.timeline({ defaults: { ease: 'power3.out' } })
       .from(titleLines, { yPercent: 112, duration: 1.15, stagger: 0.1 })
       .from('[data-hero-kicker], [data-hero-actions]', { autoAlpha: 0, y: 18, duration: 0.7, stagger: 0.08 }, '-=0.65')
@@ -115,6 +121,13 @@ onMounted(async () => {
         duration: 1.05,
         stagger: { amount: 0.7, from: 'random' }
       }, '-=0.95')
+      .from(signals, {
+        autoAlpha: 0,
+        y: 18,
+        scale: 0.96,
+        duration: 0.55,
+        stagger: 0.08
+      }, '-=0.4')
 
     media = gsap.matchMedia()
     media.add('(min-width: 900px)', () => {
@@ -158,6 +171,11 @@ onMounted(async () => {
             y: (index) => (index % 2 === 0 ? -150 : -80),
             x: (index) => (index % 3 - 1) * 42,
             autoAlpha: 0.18,
+            ease: 'none'
+          }, 0)
+          .to(signals, {
+            y: (index) => (index % 2 === 0 ? -42 : -78),
+            autoAlpha: 0.22,
             ease: 'none'
           }, 0)
       }
@@ -265,11 +283,29 @@ const addCatalogueAction = (action: typeof actions[number]) => {
       <div class="site-container relative min-h-[calc(100vh-6rem)]">
         <div class="hero-gridline" aria-hidden="true" />
 
+        <div class="hero-signal-board" aria-label="城市环保行动信号">
+          <button
+            v-for="signal in heroSignals"
+            :key="signal.code"
+            class="focus-ring hero-signal"
+            type="button"
+            data-hero-signal
+            @click="openDrawer"
+          >
+            <span class="hero-signal-code">{{ signal.code }}</span>
+            <span class="hero-signal-copy">
+              <span>{{ signal.title }}</span>
+              <small>{{ signal.meta }}</small>
+            </span>
+            <strong>{{ signal.value }}</strong>
+          </button>
+        </div>
+
         <div
-          v-for="fragment in heroFragments"
+          v-for="(fragment, index) in heroFragments"
           :key="fragment.title"
           class="float-tile"
-          :class="`float-tile-${fragment.tone}`"
+          :class="[`float-tile-${fragment.tone}`, { 'mobile-hidden-tile': index > 5 }]"
           :style="{
             left: `${fragment.x}%`,
             top: `${fragment.y}%`,
@@ -332,11 +368,47 @@ const addCatalogueAction = (action: typeof actions[number]) => {
       </div>
     </section>
 
+    <section class="section-y border-b border-ink/15">
+      <div class="site-container">
+        <div class="grid gap-10 lg:grid-cols-12">
+          <div class="lg:col-span-4">
+            <SectionLabel label="Recent additions" index="02" />
+          </div>
+          <div class="lg:col-span-8">
+            <h2 data-reveal class="max-w-5xl text-5xl font-medium leading-none md:text-7xl">
+              新增行动把环保议题继续推向能源、水体、食物和旧建筑材料。
+            </h2>
+          </div>
+        </div>
+
+        <div class="mt-14 grid gap-4 lg:grid-cols-4">
+          <NuxtLink
+            v-for="(action, index) in recentActions"
+            :key="action.slug"
+            :to="`/actions/${action.slug}`"
+            class="recent-action group focus-ring"
+            data-reveal
+          >
+            <div class="flex items-center justify-between gap-4">
+              <span class="recent-action-index">{{ String(index + 1).padStart(2, '0') }}</span>
+              <span class="recent-action-type">{{ action.type }}</span>
+            </div>
+            <div class="mt-16">
+              <p class="text-xs text-muted">{{ action.collection }}</p>
+              <h3 class="mt-3 text-3xl font-medium leading-none">{{ action.title }}</h3>
+              <p class="mt-5 text-sm leading-6 text-muted">{{ action.summary }}</p>
+            </div>
+            <div class="recent-action-line" aria-hidden="true" />
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
+
     <section ref="catalogue" class="catalogue-runway border-b border-ink/15">
       <div class="site-container py-20 lg:min-h-screen lg:py-24">
         <div class="grid gap-8 lg:grid-cols-12 lg:items-end">
           <div class="lg:col-span-4">
-            <SectionLabel label="Action catalogue" index="02" />
+            <SectionLabel label="Action catalogue" index="03" />
           </div>
           <div class="lg:col-span-8">
             <h2 data-reveal class="max-w-5xl text-5xl font-medium leading-none md:text-7xl">
@@ -389,7 +461,7 @@ const addCatalogueAction = (action: typeof actions[number]) => {
       <div class="site-container">
         <div class="grid gap-10 md:grid-cols-12">
           <div class="md:col-span-4">
-            <SectionLabel label="Civic operating system" index="03" />
+            <SectionLabel label="Civic operating system" index="04" />
           </div>
           <div class="md:col-span-8">
             <h2 data-reveal class="max-w-5xl text-5xl font-medium leading-none md:text-7xl">
@@ -411,7 +483,7 @@ const addCatalogueAction = (action: typeof actions[number]) => {
     <section ref="story" class="border-b border-ink/15">
       <div class="site-container grid gap-12 py-20 lg:grid-cols-12 lg:py-0">
         <div class="lg:sticky lg:top-0 lg:col-span-5 lg:flex lg:h-screen lg:flex-col lg:justify-center">
-          <SectionLabel label="Long-form civic story" index="04" />
+          <SectionLabel label="Long-form civic story" index="05" />
           <h2 class="mt-8 text-5xl font-medium leading-none md:text-7xl">行动从一段路开始，但要长成一套机制。</h2>
           <p class="mt-6 max-w-lg text-base leading-7 text-muted">
             Green Civic 的滚动叙事不是活动回顾，而是一条从观察、设计、部署到共管的城市行动链。
@@ -445,7 +517,7 @@ const addCatalogueAction = (action: typeof actions[number]) => {
       <div class="site-container">
         <div class="grid gap-10 lg:grid-cols-12">
           <div class="lg:col-span-5">
-            <SectionLabel label="Material library" index="05" />
+            <SectionLabel label="Material library" index="06" />
             <h2 data-reveal class="mt-8 text-5xl font-medium leading-none md:text-7xl">环保材料要像产品一样被比较、被维护、被追踪。</h2>
           </div>
           <div class="lg:col-span-6 lg:col-start-7">
@@ -538,11 +610,52 @@ const addCatalogueAction = (action: typeof actions[number]) => {
       </div>
     </section>
 
+    <section class="section-y border-b border-ink/15">
+      <div class="site-container">
+        <div class="grid gap-10 lg:grid-cols-12">
+          <div class="lg:col-span-4">
+            <SectionLabel label="Material routes" index="07" />
+          </div>
+          <div class="lg:col-span-8">
+            <h2 data-reveal class="max-w-5xl text-5xl font-medium leading-none md:text-7xl">
+              每一批材料都应该有一条被公众看得懂的路径。
+            </h2>
+          </div>
+        </div>
+
+        <div class="mt-14 grid gap-4 lg:grid-cols-4">
+          <article
+            v-for="(route, index) in materialRoutes"
+            :key="route.from"
+            class="material-route"
+            data-reveal
+          >
+            <p class="font-mono text-xs text-muted">{{ String(index + 1).padStart(2, '0') }} / ROUTE</p>
+            <div class="mt-12 grid gap-5">
+              <div>
+                <span>FROM</span>
+                <strong>{{ route.from }}</strong>
+              </div>
+              <div>
+                <span>PROCESS</span>
+                <strong>{{ route.method }}</strong>
+              </div>
+              <div>
+                <span>TO</span>
+                <strong>{{ route.to }}</strong>
+              </div>
+            </div>
+            <p class="mt-10 border-t border-ink/15 pt-5 text-sm leading-6 text-muted">{{ route.output }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="section-y border-b border-ink/15 bg-[#ede7da]">
       <div class="site-container">
         <div class="grid gap-10 lg:grid-cols-12">
           <div class="lg:col-span-4">
-            <SectionLabel label="Civic toolkits" index="06" />
+            <SectionLabel label="Civic toolkits" index="08" />
           </div>
           <div class="lg:col-span-8">
             <h2 data-reveal class="max-w-5xl text-5xl font-medium leading-none md:text-7xl">
@@ -570,7 +683,7 @@ const addCatalogueAction = (action: typeof actions[number]) => {
     <section class="section-y border-b border-ink/15">
       <div class="site-container grid gap-10 lg:grid-cols-12">
         <div class="lg:col-span-5">
-          <SectionLabel label="Sustainability system" index="07" />
+          <SectionLabel label="Sustainability system" index="09" />
           <h2 data-reveal class="mt-8 text-5xl font-medium leading-none md:text-7xl">可持续不是章节，是每个行动的结构。</h2>
         </div>
         <div class="grid gap-4 lg:col-span-6 lg:col-start-7">
@@ -587,11 +700,45 @@ const addCatalogueAction = (action: typeof actions[number]) => {
       </div>
     </section>
 
+    <section class="section-y border-b border-ink/15 bg-[#f8f5ec]">
+      <div class="site-container">
+        <div class="grid gap-10 lg:grid-cols-12">
+          <div class="lg:col-span-4">
+            <SectionLabel label="Public ledger" index="10" />
+          </div>
+          <div class="lg:col-span-8">
+            <h2 data-reveal class="max-w-5xl text-5xl font-medium leading-none md:text-7xl">
+              环保行动要留下维护记录，公众才知道它仍在运行。
+            </h2>
+          </div>
+        </div>
+
+        <div class="mt-14 border-t border-ink/15">
+          <article
+            v-for="entry in civicLedgers"
+            :key="`${entry.area}-${entry.action}`"
+            class="ledger-row"
+            data-reveal
+          >
+            <div>
+              <p class="text-sm text-muted">{{ entry.area }}</p>
+              <h3 class="mt-2 text-2xl font-medium">{{ entry.action }}</h3>
+            </div>
+            <p class="text-sm leading-6 text-muted">{{ entry.material }}</p>
+            <div class="ledger-status">
+              <span>{{ entry.status }}</span>
+              <strong>{{ entry.metric }}</strong>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="section-y border-b border-ink/15">
       <div class="site-container">
         <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <SectionLabel label="Journal" index="08" />
+            <SectionLabel label="Journal" index="11" />
             <h2 data-reveal class="mt-8 text-5xl font-medium leading-none md:text-7xl">案例与田野记录</h2>
           </div>
           <NuxtLink to="/journal" class="focus-ring magnetic-button flex h-12 w-fit items-center gap-2 rounded-full border border-ink/15 px-5 text-sm">
